@@ -1,0 +1,84 @@
+{
+    "name": "looksystems/eloquent-cypher",
+    "version": "1.0.0",
+    "description": "A production-ready Neo4j adapter for Laravel Eloquent - true drop-in replacement with zero code changes",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "neo4j",
+        "laravel",
+        "eloquent",
+        "graph",
+        "database",
+        "cypher",
+        "orm",
+        "graph-database",
+        "neo4j-driver",
+        "laravel-package"
+    ],
+    "homepage": "https://github.com/looksystems/eloquent-cypher",
+    "support": {
+        "issues": "https://github.com/looksystems/eloquent-cypher/issues",
+        "source": "https://github.com/looksystems/eloquent-cypher",
+        "docs": "https://github.com/looksystems/eloquent-cypher/wiki"
+    },
+    "autoload": {
+        "psr-4": {
+            "Look\\EloquentCypher\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Adrian Keeling-Look",
+            "email": "info@look.systems"
+        }
+    ],
+    "require": {
+        "php": "^8.0|^8.1|^8.2|^8.3|^8.4",
+        "illuminate/database": "^10.0|^11.0|^12.0",
+        "laudis/neo4j-php-client": "^3.4",
+        "wikibase-solutions/php-cypher-dsl": "^3.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true,
+            "pestphp/pest-plugin": true
+        }
+    },
+    "scripts": {
+        "test": "./vendor/bin/pest",
+        "test:coverage": "command -v herd > /dev/null 2>&1 && herd coverage ./vendor/bin/pest || ./vendor/bin/pest --coverage-text",
+        "test:filter": "./vendor/bin/pest --filter",
+        "analyse": "./vendor/bin/phpstan analyse src/",
+        "format": "./vendor/bin/pint --test",
+        "format:fix": "./vendor/bin/pint",
+        "neo4j:up": "docker-compose up -d",
+        "neo4j:down": "docker-compose down",
+        "neo4j:clean": "docker-compose down -v",
+        "check": [
+            "@test",
+            "@analyse",
+            "@format"
+        ],
+        "ci": [
+            "@test:coverage",
+            "@analyse",
+            "@format"
+        ]
+    },
+    "require-dev": {
+        "orchestra/testbench": "^8.0|^9.0|^10.0",
+        "pestphp/pest": "*",
+        "pestphp/pest-plugin-laravel": "*",
+        "rector/rector": "^2.1",
+        "phpstan/phpstan": "^2.1",
+        "laravel/pint": "^1.25"
+    }
+}

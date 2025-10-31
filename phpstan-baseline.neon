@@ -1,0 +1,583 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Method Look\\EloquentCypher\\Builders\\WhereClauseBuilder\:\:formatDateValue\(\) should return string but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Builders/WhereClauseBuilder.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Builders\\WhereClauseBuilder\:\:formatTimeValue\(\) should return string but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Builders/WhereClauseBuilder.php
+
+		-
+			message: '#^Cannot call method getForeignPivotKeyName\(\) on class\-string\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Commands/MigrateToEdgesCommand.php
+
+		-
+			message: '#^Cannot call method getParentKeyName\(\) on class\-string\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Commands/MigrateToEdgesCommand.php
+
+		-
+			message: '#^Cannot call method getRelated\(\) on class\-string\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Commands/MigrateToEdgesCommand.php
+
+		-
+			message: '#^Cannot call method getRelatedKeyName\(\) on class\-string\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Commands/MigrateToEdgesCommand.php
+
+		-
+			message: '#^Cannot call method getRelatedPivotKeyName\(\) on class\-string\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Commands/MigrateToEdgesCommand.php
+
+		-
+			message: '#^Call to an undefined static method Look\\EloquentCypher\\Facades\\GraphSchema\:\:introspect\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Commands/Schema/SchemaCommand.php
+
+		-
+			message: '#^Call to an undefined static method Look\\EloquentCypher\\Facades\\GraphSchema\:\:getConstraints\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Commands/Schema/SchemaConstraintsCommand.php
+
+		-
+			message: '#^Call to an undefined static method Look\\EloquentCypher\\Facades\\GraphSchema\:\:introspect\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Commands/Schema/SchemaExportCommand.php
+
+		-
+			message: '#^Call to an undefined static method Look\\EloquentCypher\\Facades\\GraphSchema\:\:getIndexes\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Commands/Schema/SchemaIndexesCommand.php
+
+		-
+			message: '#^Call to an undefined static method Look\\EloquentCypher\\Facades\\GraphSchema\:\:getAllLabels\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Commands/Schema/SchemaLabelsCommand.php
+
+		-
+			message: '#^Call to an undefined static method Look\\EloquentCypher\\Facades\\GraphSchema\:\:getAllPropertyKeys\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Commands/Schema/SchemaPropertiesCommand.php
+
+		-
+			message: '#^Call to an undefined static method Look\\EloquentCypher\\Facades\\GraphSchema\:\:getAllRelationshipTypes\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Commands/Schema/SchemaRelationshipsCommand.php
+
+		-
+			message: '#^Access to an undefined property Look\\EloquentCypher\\EdgePivot\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/EdgePivot.php
+
+		-
+			message: '#^Access to an undefined property Look\\EloquentCypher\\EdgePivot\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/EdgePivot.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: src/EdgePivot.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Exceptions\\GraphConnectionException\:\:authenticationFailed\(\) should return static\(Look\\EloquentCypher\\Exceptions\\GraphConnectionException\) but returns Look\\EloquentCypher\\Exceptions\\GraphConnectionException\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Exceptions/GraphConnectionException.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Exceptions\\GraphConnectionException\:\:connectionPoolExhausted\(\) should return static\(Look\\EloquentCypher\\Exceptions\\GraphConnectionException\) but returns Look\\EloquentCypher\\Exceptions\\GraphConnectionException\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Exceptions/GraphConnectionException.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Exceptions\\GraphConnectionException\:\:databaseNotFound\(\) should return static\(Look\\EloquentCypher\\Exceptions\\GraphConnectionException\) but returns Look\\EloquentCypher\\Exceptions\\GraphConnectionException\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Exceptions/GraphConnectionException.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Exceptions\\GraphConnectionException\:\:missingCredentials\(\) should return static\(Look\\EloquentCypher\\Exceptions\\GraphConnectionException\) but returns Look\\EloquentCypher\\Exceptions\\GraphConnectionException\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Exceptions/GraphConnectionException.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Exceptions\\GraphConnectionException\:\:serverUnreachable\(\) should return static\(Look\\EloquentCypher\\Exceptions\\GraphConnectionException\) but returns Look\\EloquentCypher\\Exceptions\\GraphConnectionException\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Exceptions/GraphConnectionException.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Exceptions\\GraphConstraintException\:\:constraintCreationFailed\(\) should return static\(Look\\EloquentCypher\\Exceptions\\GraphConstraintException\) but returns Look\\EloquentCypher\\Exceptions\\GraphConstraintException\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Exceptions/GraphConstraintException.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Exceptions\\GraphConstraintException\:\:uniqueConstraintViolation\(\) should return static\(Look\\EloquentCypher\\Exceptions\\GraphConstraintException\) but returns Look\\EloquentCypher\\Exceptions\\GraphConstraintException\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Exceptions/GraphConstraintException.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Exceptions\\GraphQueryException\:\:invalidAggregateFunction\(\) should return static\(Look\\EloquentCypher\\Exceptions\\GraphQueryException\) but returns Look\\EloquentCypher\\Exceptions\\GraphQueryException\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Exceptions/GraphQueryException.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Exceptions\\GraphQueryException\:\:invalidCastType\(\) should return static\(Look\\EloquentCypher\\Exceptions\\GraphQueryException\) but returns Look\\EloquentCypher\\Exceptions\\GraphQueryException\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Exceptions/GraphQueryException.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Exceptions\\GraphQueryException\:\:invalidParameter\(\) should return static\(Look\\EloquentCypher\\Exceptions\\GraphQueryException\) but returns Look\\EloquentCypher\\Exceptions\\GraphQueryException\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Exceptions/GraphQueryException.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Exceptions\\GraphQueryException\:\:invalidRelationType\(\) should return static\(Look\\EloquentCypher\\Exceptions\\GraphQueryException\) but returns Look\\EloquentCypher\\Exceptions\\GraphQueryException\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Exceptions/GraphQueryException.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Exceptions\\GraphQueryException\:\:labelNotFound\(\) should return static\(Look\\EloquentCypher\\Exceptions\\GraphQueryException\) but returns Look\\EloquentCypher\\Exceptions\\GraphQueryException\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Exceptions/GraphQueryException.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Exceptions\\GraphQueryException\:\:missingOrderByForChunk\(\) should return static\(Look\\EloquentCypher\\Exceptions\\GraphQueryException\) but returns Look\\EloquentCypher\\Exceptions\\GraphQueryException\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Exceptions/GraphQueryException.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Exceptions\\GraphQueryException\:\:propertyNotFound\(\) should return static\(Look\\EloquentCypher\\Exceptions\\GraphQueryException\) but returns Look\\EloquentCypher\\Exceptions\\GraphQueryException\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Exceptions/GraphQueryException.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Exceptions\\GraphQueryException\:\:queryTimeout\(\) should return static\(Look\\EloquentCypher\\Exceptions\\GraphQueryException\) but returns Look\\EloquentCypher\\Exceptions\\GraphQueryException\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Exceptions/GraphQueryException.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Exceptions\\GraphQueryException\:\:relationshipTypeNotFound\(\) should return static\(Look\\EloquentCypher\\Exceptions\\GraphQueryException\) but returns Look\\EloquentCypher\\Exceptions\\GraphQueryException\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Exceptions/GraphQueryException.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Exceptions\\GraphQueryException\:\:syntaxError\(\) should return static\(Look\\EloquentCypher\\Exceptions\\GraphQueryException\) but returns Look\\EloquentCypher\\Exceptions\\GraphQueryException\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Exceptions/GraphQueryException.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Exceptions\\GraphQueryException\:\:unsupportedOperation\(\) should return static\(Look\\EloquentCypher\\Exceptions\\GraphQueryException\) but returns Look\\EloquentCypher\\Exceptions\\GraphQueryException\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Exceptions/GraphQueryException.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Exceptions\\GraphTransactionException\:\:deadlockDetected\(\) should return static\(Look\\EloquentCypher\\Exceptions\\GraphTransactionException\) but returns Look\\EloquentCypher\\Exceptions\\GraphTransactionException\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Exceptions/GraphTransactionException.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Exceptions\\GraphTransactionException\:\:nestedTransactionsNotSupported\(\) should return static\(Look\\EloquentCypher\\Exceptions\\GraphTransactionException\) but returns Look\\EloquentCypher\\Exceptions\\GraphTransactionException\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Exceptions/GraphTransactionException.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Exceptions\\GraphTransactionException\:\:noActiveTransaction\(\) should return static\(Look\\EloquentCypher\\Exceptions\\GraphTransactionException\) but returns Look\\EloquentCypher\\Exceptions\\GraphTransactionException\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Exceptions/GraphTransactionException.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Exceptions\\GraphTransactionException\:\:transactionAlreadyActive\(\) should return static\(Look\\EloquentCypher\\Exceptions\\GraphTransactionException\) but returns Look\\EloquentCypher\\Exceptions\\GraphTransactionException\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Exceptions/GraphTransactionException.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Exceptions\\GraphTransactionException\:\:transactionRolledBack\(\) should return static\(Look\\EloquentCypher\\Exceptions\\GraphTransactionException\) but returns Look\\EloquentCypher\\Exceptions\\GraphTransactionException\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Exceptions/GraphTransactionException.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Exceptions\\GraphTransactionException\:\:transactionTimeout\(\) should return static\(Look\\EloquentCypher\\Exceptions\\GraphTransactionException\) but returns Look\\EloquentCypher\\Exceptions\\GraphTransactionException\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Exceptions/GraphTransactionException.php
+
+		-
+			message: '#^PHPDoc tag @method for method Look\\EloquentCypher\\Facades\\Cypher\:\:query\(\) return type contains unknown class Look\\EloquentCypher\\Builders\\Neo4jCypherDslBuilder\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Facades/Cypher.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\GraphConnection\:\:getDefaultQueryGrammar\(\) should return Illuminate\\Database\\Query\\Grammars\\Grammar but returns null\.$#'
+			identifier: return.type
+			count: 1
+			path: src/GraphConnection.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\GraphConnection\:\:insert\(\) should return bool but returns int\.$#'
+			identifier: return.type
+			count: 1
+			path: src/GraphConnection.php
+
+		-
+			message: '#^Return type \(Look\\EloquentCypher\\Schema\\GraphSchemaBuilder\) of method Look\\EloquentCypher\\GraphConnection\:\:getSchemaBuilder\(\) should be compatible with return type \(Illuminate\\Database\\Schema\\Builder\) of method Illuminate\\Database\\Connection\:\:getSchemaBuilder\(\)$#'
+			identifier: method.childReturnType
+			count: 1
+			path: src/GraphConnection.php
+
+		-
+			message: '#^Return type \(Look\\EloquentCypher\\Schema\\GraphSchemaGrammar\) of method Look\\EloquentCypher\\GraphConnection\:\:getDefaultSchemaGrammar\(\) should be compatible with return type \(Illuminate\\Database\\Schema\\Grammars\\Grammar\|null\) of method Illuminate\\Database\\Connection\:\:getDefaultSchemaGrammar\(\)$#'
+			identifier: method.childReturnType
+			count: 1
+			path: src/GraphConnection.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:hydrate\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/GraphEloquentBuilder.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Query\\Builder\:\:collect\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/GraphEloquentBuilder.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Query\\Builder\:\:percentileCont\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/GraphEloquentBuilder.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Query\\Builder\:\:percentileDisc\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/GraphEloquentBuilder.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Query\\Builder\:\:stdev\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/GraphEloquentBuilder.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Query\\Builder\:\:stdevp\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/GraphEloquentBuilder.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\GraphEloquentBuilder\:\:findMany\(\) should return Illuminate\\Database\\Eloquent\\Collection but returns Illuminate\\Support\\Collection\<int, stdClass\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/GraphEloquentBuilder.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\GraphEloquentBuilder\:\:forPageAfterId\(\) should return \$this\(Look\\EloquentCypher\\GraphEloquentBuilder\) but returns Illuminate\\Database\\Query\\Builder\.$#'
+			identifier: return.type
+			count: 1
+			path: src/GraphEloquentBuilder.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Query\\Builder\:\:\$customLabels\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/GraphModel.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Connection\:\:cypher\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/GraphModel.php
+
+		-
+			message: '#^Call to an undefined method Look\\EloquentCypher\\GraphModel\:\:getDeletedAtColumn\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/GraphModel.php
+
+		-
+			message: '#^Call to an undefined static method Look\\EloquentCypher\\GraphModel\:\:create\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/GraphModel.php
+
+		-
+			message: '#^Call to an undefined static method Look\\EloquentCypher\\GraphModel\:\:where\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 2
+			path: src/GraphModel.php
+
+		-
+			message: '#^Default value of the parameter \#8 \$inverse \(false\) of method Look\\EloquentCypher\\GraphModel\:\:morphToMany\(\) is incompatible with type string\|null\.$#'
+			identifier: parameter.defaultValue
+			count: 1
+			path: src/GraphModel.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\GraphModel\:\:belongsTo\(\) should return Illuminate\\Database\\Eloquent\\Relations\\BelongsTo\<TRelatedModel of Illuminate\\Database\\Eloquent\\Model, \$this\(Look\\EloquentCypher\\GraphModel\)\> but returns Look\\EloquentCypher\\Relations\\GraphBelongsTo\.$#'
+			identifier: return.type
+			count: 1
+			path: src/GraphModel.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\GraphModel\:\:belongsToMany\(\) should return Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany\<TRelatedModel of Illuminate\\Database\\Eloquent\\Model, \$this\(Look\\EloquentCypher\\GraphModel\), Illuminate\\Database\\Eloquent\\Relations\\Pivot, ''pivot''\> but returns Look\\EloquentCypher\\Relations\\GraphBelongsToMany\.$#'
+			identifier: return.type
+			count: 1
+			path: src/GraphModel.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\GraphModel\:\:getCastType\(\) should return string but returns null\.$#'
+			identifier: return.type
+			count: 1
+			path: src/GraphModel.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\GraphModel\:\:hasMany\(\) should return Illuminate\\Database\\Eloquent\\Relations\\HasMany\<TRelatedModel of Illuminate\\Database\\Eloquent\\Model, \$this\(Look\\EloquentCypher\\GraphModel\)\> but returns Look\\EloquentCypher\\Relations\\GraphHasMany\.$#'
+			identifier: return.type
+			count: 1
+			path: src/GraphModel.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\GraphModel\:\:hasManyThrough\(\) should return Illuminate\\Database\\Eloquent\\Relations\\HasManyThrough\<TRelatedModel of Illuminate\\Database\\Eloquent\\Model, TIntermediateModel of Illuminate\\Database\\Eloquent\\Model, \$this\(Look\\EloquentCypher\\GraphModel\)\> but returns Look\\EloquentCypher\\Relations\\GraphHasManyThrough\.$#'
+			identifier: return.type
+			count: 1
+			path: src/GraphModel.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\GraphModel\:\:hasOne\(\) should return Illuminate\\Database\\Eloquent\\Relations\\HasOne\<TRelatedModel of Illuminate\\Database\\Eloquent\\Model, \$this\(Look\\EloquentCypher\\GraphModel\)\> but returns Look\\EloquentCypher\\Relations\\GraphHasOne\.$#'
+			identifier: return.type
+			count: 1
+			path: src/GraphModel.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\GraphModel\:\:hasOneThrough\(\) should return Illuminate\\Database\\Eloquent\\Relations\\HasOneThrough\<TRelatedModel of Illuminate\\Database\\Eloquent\\Model, TIntermediateModel of Illuminate\\Database\\Eloquent\\Model, \$this\(Look\\EloquentCypher\\GraphModel\)\> but returns Look\\EloquentCypher\\Relations\\GraphHasOneThrough\.$#'
+			identifier: return.type
+			count: 1
+			path: src/GraphModel.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\GraphModel\:\:morphToMany\(\) should return Illuminate\\Database\\Eloquent\\Relations\\MorphToMany\<TRelatedModel of Illuminate\\Database\\Eloquent\\Model, \$this\(Look\\EloquentCypher\\GraphModel\), Illuminate\\Database\\Eloquent\\Relations\\MorphPivot, ''pivot''\> but returns Look\\EloquentCypher\\Relations\\GraphMorphToMany\.$#'
+			identifier: return.type
+			count: 1
+			path: src/GraphModel.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\GraphModel\:\:performDeleteOnModel\(\) with return type void returns mixed but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/GraphModel.php
+
+		-
+			message: '#^Return type \(\$this\(Look\\EloquentCypher\\GraphModel\)\) of method Look\\EloquentCypher\\GraphModel\:\:decrement\(\) should be compatible with return type \(int\) of method Illuminate\\Database\\Eloquent\\Model\:\:decrement\(\)$#'
+			identifier: method.childReturnType
+			count: 1
+			path: src/GraphModel.php
+
+		-
+			message: '#^Return type \(\$this\(Look\\EloquentCypher\\GraphModel\)\) of method Look\\EloquentCypher\\GraphModel\:\:increment\(\) should be compatible with return type \(int\) of method Illuminate\\Database\\Eloquent\\Model\:\:increment\(\)$#'
+			identifier: method.childReturnType
+			count: 1
+			path: src/GraphModel.php
+
+		-
+			message: '#^Return type \(\$this\(Look\\EloquentCypher\\GraphModel\)\) of method Look\\EloquentCypher\\GraphModel\:\:incrementOrDecrement\(\) should be compatible with return type \(int\) of method Illuminate\\Database\\Eloquent\\Model\:\:incrementOrDecrement\(\)$#'
+			identifier: method.childReturnType
+			count: 1
+			path: src/GraphModel.php
+
+		-
+			message: '#^Return type \(void\) of method Look\\EloquentCypher\\GraphModel\:\:updateTimestamps\(\) should be compatible with return type \(\$this\(Illuminate\\Database\\Eloquent\\Model\)\) of method Illuminate\\Database\\Eloquent\\Model\:\:updateTimestamps\(\)$#'
+			identifier: method.childReturnType
+			count: 1
+			path: src/GraphModel.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 10
+			path: src/GraphModel.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\ConnectionInterface\:\:getConfig\(\)\.$#'
+			identifier: method.notFound
+			count: 6
+			path: src/GraphQueryBuilder.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\ConnectionInterface\:\:statements\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: src/GraphQueryBuilder.php
+
+		-
+			message: '#^Callable callable\(Illuminate\\Support\\Collection\<int, object\>, int\)\: mixed invoked with 1 parameter, 2 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: src/GraphQueryBuilder.php
+
+		-
+			message: '#^Method Illuminate\\Database\\Query\\Expression\<float\|int\|string\>\:\:getValue\(\) invoked with 0 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: src/GraphQueryBuilder.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\GraphQueryBuilder\:\:forSubQuery\(\) should return static\(Look\\EloquentCypher\\GraphQueryBuilder\) but returns Illuminate\\Database\\Query\\Builder\.$#'
+			identifier: return.type
+			count: 1
+			path: src/GraphQueryBuilder.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\GraphQueryBuilder\:\:insertGetId\(\) should return int\|string but returns null\.$#'
+			identifier: return.type
+			count: 2
+			path: src/GraphQueryBuilder.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$pivot\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Relations/GraphBelongsToMany.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Relations\\GraphBelongsToMany\:\:attach\(\) with return type void returns \$this\(Look\\EloquentCypher\\Relations\\GraphBelongsToMany\) but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Relations/GraphBelongsToMany.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Relations\\GraphBelongsToMany\:\:attach\(\) with return type void returns mixed but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Relations/GraphBelongsToMany.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Relations\\GraphBelongsToMany\:\:getResults\(\) should return Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model&object\{pivot\: Illuminate\\Database\\Eloquent\\Relations\\Pivot\}\> but returns Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Relations/GraphBelongsToMany.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Relations\\GraphBelongsToMany\:\:updateExistingPivot\(\) should return int but returns bool\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Relations/GraphBelongsToMany.php
+
+		-
+			message: '#^Self\-out type static\(Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany\<TRelatedModel of Illuminate\\Database\\Eloquent\\Model \(class Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany, parameter\), TDeclaringModel of Illuminate\\Database\\Eloquent\\Model \(class Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany, parameter\), TPivotModel of Illuminate\\Database\\Eloquent\\Relations\\Pivot \= Illuminate\\Database\\Eloquent\\Relations\\Pivot \(class Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany, parameter\), TNewAccessor of string \(method Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany\:\:as\(\), parameter\)\>\) of method Look\\EloquentCypher\\Relations\\GraphBelongsToMany\:\:as is not subtype of Look\\EloquentCypher\\Relations\\GraphBelongsToMany\.$#'
+			identifier: selfOut.type
+			count: 1
+			path: src/Relations/GraphBelongsToMany.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$laravel_through_key\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Relations/GraphHasManyThrough.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Relations\\GraphHasManyThrough\:\:prepareQueryBuilder\(\) should return Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\> but returns Illuminate\\Database\\Query\\Builder\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Relations/GraphHasManyThrough.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$laravel_through_key\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Relations/GraphHasOneThrough.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Relations\\GraphHasOneThrough\:\:get\(\) should return Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\> but returns Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Relations/GraphHasOneThrough.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$pivot\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Relations/GraphMorphToMany.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Relations\\GraphMorphToMany\:\:attach\(\) with return type void returns \$this\(Look\\EloquentCypher\\Relations\\GraphMorphToMany\) but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Relations/GraphMorphToMany.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Relations\\GraphMorphToMany\:\:buildDictionary\(\) should return array\<array\<string, Illuminate\\Database\\Eloquent\\Model\>\> but returns array\<list\<Illuminate\\Database\\Eloquent\\Model\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Relations/GraphMorphToMany.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Relations\\GraphMorphToMany\:\:getResults\(\) should return Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model&object\{pivot\: Illuminate\\Database\\Eloquent\\Relations\\MorphPivot\}\> but returns Illuminate\\Database\\Eloquent\\Collection\<\(int\|string\), Illuminate\\Database\\Eloquent\\Model\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Relations/GraphMorphToMany.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Relations\\GraphMorphToMany\:\:getResults\(\) should return Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model&object\{pivot\: Illuminate\\Database\\Eloquent\\Relations\\MorphPivot\}\> but returns Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Relations/GraphMorphToMany.php
+
+		-
+			message: '#^Method Look\\EloquentCypher\\Relations\\GraphMorphToMany\:\:updateExistingPivot\(\) should return int but returns bool\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Relations/GraphMorphToMany.php
+
+		-
+			message: '#^Variable \$orderClauses in empty\(\) always exists and is not falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: src/Strategies/QueryExecutionStrategy.php
