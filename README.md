@@ -835,7 +835,7 @@ See [docs/missing-functionality-analysis.md](docs/missing-functionality-analysis
 
 ## 📊 Compatibility Matrix
 
-For a comprehensive method-by-method comparison between Laravel Eloquent and this Neo4j implementation, including test coverage information, see the [Compatibility Matrix](docs/compatibility-matrix.md).
+For a comprehensive method-by-method comparison between Laravel Eloquent and this Neo4j implementation, including test coverage information, see the [Compatibility Matrix](docs/COMPATIBILITY-MATRIX.md).
 
 ## 🤝 Contributing
 
