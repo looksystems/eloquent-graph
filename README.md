@@ -1,5 +1,7 @@
 # Eloquent Cypher - Graph Database for Laravel
 
+> **NOTE**: This is an experimental/learning ai coding project only and is under active development.
+
 [![Latest Version](https://img.shields.io/packagist/v/looksystems/eloquent-cypher.svg)](https://packagist.org/packages/looksystems/eloquent-cypher)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-1442%20passing%20%2B%2028%20skipped-brightgreen.svg)](#testing)
