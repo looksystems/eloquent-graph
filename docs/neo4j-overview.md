@@ -67,7 +67,7 @@ This overview helps you quickly identify which Neo4j feature solves your problem
 
 ```php
 // Example: User who is also an Employee and Manager
-class User extends Neo4JModel {
+class User extends GraphModel {
     protected $labels = ['Person', 'Employee', 'Manager'];
 }
 ```
@@ -127,7 +127,7 @@ $user->settings = ['theme' => 'dark'];  // Nested → JSON
 
 **Quick Example**:
 ```php
-class User extends Neo4JModel {
+class User extends GraphModel {
     protected $labels = ['Person', 'Individual'];
     // Result: :users:Person:Individual
 }
@@ -360,7 +360,6 @@ $users = User::whereJsonLength('tags', '>', 5)->get();
 **Need Help?**
 - Review [Quick Reference](quick-reference.md) for syntax reminders
 - Check [Troubleshooting](troubleshooting.md) for common issues
-- See [Migration Guide](migration-guide.md) for switching from NeoEloquent
 
 ---
 

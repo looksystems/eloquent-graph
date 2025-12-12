@@ -92,7 +92,7 @@ Schema::create('users', function (Blueprint $table) {
 use Look\EloquentCypher\Schema\Neo4jBlueprint;
 
 // Create indexes and constraints
-Schema::connection('neo4j')->create('users', function (Neo4jBlueprint $blueprint) {
+Schema::connection('graph')->create('users', function (Neo4jBlueprint $blueprint) {
     // Indexes for performance
     $blueprint->index('email')->unique();
     $blueprint->index('username')->unique();
@@ -106,7 +106,7 @@ Schema::connection('neo4j')->create('users', function (Neo4jBlueprint $blueprint
 });
 
 // Add indexes to existing labels
-Schema::connection('neo4j')->label('posts', function (Neo4jBlueprint $blueprint) {
+Schema::connection('graph')->label('posts', function (Neo4jBlueprint $blueprint) {
     $blueprint->index('slug')->unique();
     $blueprint->index('published_at');
 });
@@ -114,7 +114,7 @@ Schema::connection('neo4j')->label('posts', function (Neo4jBlueprint $blueprint)
 
 **Property Validation Alternative**:
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected static function booted()
     {
@@ -156,7 +156,7 @@ These features are not implemented in this package as they would break Community
 For validation that works with both Community and Enterprise editions:
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $required = ['email', 'name'];
 
@@ -207,9 +207,9 @@ class UserController extends Controller
 **Community Workaround**:
 ```php
 // Implement access control in application layer
-class SecureNeo4jModel extends Neo4JModel
+class SecureGraphModel extends GraphModel
 {
-    public static function bootSecureNeo4jModel()
+    public static function bootSecureGraphModel()
     {
         // Apply tenant filtering
         static::addGlobalScope('tenant', function ($builder) {
@@ -240,7 +240,7 @@ class SecureNeo4jModel extends Neo4JModel
 **Slow Query Example**:
 ```php
 // Without native edges - uses reflection
-class Country extends Neo4JModel
+class Country extends GraphModel
 {
     public function posts()
     {
@@ -257,7 +257,7 @@ RETURN p
 
 **Solution**: Enable native edges:
 ```php
-class Country extends Neo4JModel
+class Country extends GraphModel
 {
     use Neo4jNativeRelationships;
 
@@ -349,7 +349,7 @@ User::select('city', DB::raw('COUNT(*) as count'))
 
 **Solution**: Use raw Cypher for complex aggregations:
 ```php
-$results = DB::connection('neo4j')->cypher('
+$results = DB::connection('graph')->cypher('
     MATCH (u:users)
     WITH u.city as city, COUNT(*) as user_count
     WHERE user_count > 10
@@ -399,7 +399,7 @@ $results = User::joinPattern('(u:users)-[:POSTED]->(p:posts)')
 
 **Option 3: Raw Cypher**:
 ```php
-$results = DB::connection('neo4j')->cypher('
+$results = DB::connection('graph')->cypher('
     MATCH (u:users)-[:POSTED]->(p:posts)
     WHERE p.published = true
     RETURN u, collect(p) as posts
@@ -439,7 +439,7 @@ User::where('email', 'JOHN@EXAMPLE.COM')->first(); // Won't find 'john@example.c
 **Solutions**:
 ```php
 // Option 1: Store lowercase
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected static function booted()
     {
@@ -467,7 +467,7 @@ User::where('email', 'CONTAINS', 'john')->get();
 **Handling Concurrent Updates**:
 ```php
 // Use managed transactions with automatic retry
-DB::connection('neo4j')->write(function ($connection) use ($userId, $amount) {
+DB::connection('graph')->write(function ($connection) use ($userId, $amount) {
     $user = User::find($userId);
     $user->balance += $amount;
     $user->save();
@@ -515,7 +515,7 @@ $users = User::whereHas('posts', function ($query) {
 })->get();
 
 // Option 3: Raw Cypher with WITH clause
-$users = DB::connection('neo4j')->cypher('
+$users = DB::connection('graph')->cypher('
     MATCH (p:posts {published: true})
     WITH DISTINCT p.user_id as user_id
     MATCH (u:users {id: user_id})
@@ -559,7 +559,7 @@ User::whereRaw('size(n.name) > 10')->get(); // Long names
 
 ```php
 // Check APOC availability
-$hasApoc = DB::connection('neo4j')->cypher('
+$hasApoc = DB::connection('graph')->cypher('
     CALL dbms.procedures()
     YIELD name
     WHERE name STARTS WITH "apoc"
@@ -569,12 +569,12 @@ $hasApoc = DB::connection('neo4j')->cypher('
 // Use APOC procedures
 if ($hasApoc) {
     // Generate UUID
-    $uuid = DB::connection('neo4j')->cypher('
+    $uuid = DB::connection('graph')->cypher('
         CALL apoc.create.uuid() YIELD uuid RETURN uuid
     ')->first()->uuid;
 
     // JSON operations
-    $json = DB::connection('neo4j')->cypher('
+    $json = DB::connection('graph')->cypher('
         CALL apoc.convert.toJson($data) YIELD value RETURN value
     ', ['data' => $complexData]);
 }
@@ -602,7 +602,7 @@ class Neo4jProcedures
 #### 1. Use Native Graph Features
 ```php
 // Instead of foreign keys, use edges
-class User extends Neo4JModel
+class User extends GraphModel
 {
     use Neo4jNativeRelationships;
     protected $useNativeRelationships = true;
@@ -612,7 +612,7 @@ class User extends Neo4JModel
 #### 2. Leverage Raw Cypher
 ```php
 // For complex operations, use raw Cypher
-$results = DB::connection('neo4j')->cypher('
+$results = DB::connection('graph')->cypher('
     MATCH path = shortestPath(
         (a:users {id: $userA})-[:FRIEND_OF*]-(b:users {id: $userB})
     )
@@ -681,7 +681,7 @@ $users = Cache::remember('active-users', 3600, function () {
 #### 3. Use Indexes Effectively
 ```php
 // Ensure indexes exist for frequently queried fields
-Schema::connection('neo4j')->label('users', function ($blueprint) {
+Schema::connection('graph')->label('users', function ($blueprint) {
     $blueprint->index('email');
     $blueprint->index('status');
     $blueprint->index(['status', 'created_at'])->composite();
@@ -784,7 +784,7 @@ class RelationshipMigrator
         Post::chunk(1000, function ($posts) {
             foreach ($posts as $post) {
                 // Create edge
-                DB::connection('neo4j')->cypher('
+                DB::connection('graph')->cypher('
                     MATCH (u:users {id: $userId})
                     MATCH (p:posts {id: $postId})
                     MERGE (u)-[:HAS_POST {created_at: $createdAt}]->(p)

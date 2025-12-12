@@ -26,8 +26,8 @@ This is your quick lookup guide for common operations, configuration options, an
 
 | Standard Eloquent | Eloquent Cypher | Notes |
 |-------------------|-----------------|-------|
-| `class User extends Model` | `class User extends Neo4JModel` | Change base class |
-| `$connection = 'mysql'` | `$connection = 'neo4j'` | Point to Neo4j connection |
+| `class User extends Model` | `class User extends GraphModel` | Change base class |
+| `$connection = 'mysql'` | `$connection = 'graph'` | Point to graph connection |
 | `$incrementing = true` | `$incrementing = false` | Neo4j doesn't auto-increment |
 | `find($id)` | `find($id)` | ✅ Identical API |
 | `where('age', '>', 30)` | `where('age', '>', 30)` | ✅ Identical API |
@@ -49,11 +49,11 @@ This is your quick lookup guide for common operations, configuration options, an
 ### Model Setup
 
 ```php
-use Look\EloquentCypher\Neo4JModel;
+use Look\EloquentCypher\GraphModel;
 
-class User extends Neo4JModel
+class User extends GraphModel
 {
-    protected $connection = 'neo4j';
+    protected $connection = 'graph';
     protected $table = 'users';                    // Creates :users label
     protected $primaryKey = 'id';
     protected $keyType = 'int';
@@ -95,7 +95,7 @@ User::where('inactive', true)->delete();
 
 ```php
 // Define Relationships
-class User extends Neo4JModel
+class User extends GraphModel
 {
     public function posts()
     {
@@ -175,7 +175,7 @@ User::collect('skills');                        // Collect into array
 // Enable native edges on model
 use Look\EloquentCypher\Traits\Neo4jNativeRelationships;
 
-class User extends Neo4JModel
+class User extends GraphModel
 {
     use Neo4jNativeRelationships;
 
@@ -195,7 +195,7 @@ $user->posts;  // Uses graph traversal automatically
 ### Multi-Label Nodes
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $table = 'users';                 // Primary label :users
     protected $labels = ['Person', 'Individual']; // Additional labels
@@ -425,14 +425,14 @@ User::upsert(
 use Illuminate\Support\Facades\DB;
 
 // Write transaction with automatic retry
-$user = DB::connection('neo4j')->write(function ($connection) {
+$user = DB::connection('graph')->write(function ($connection) {
     $user = User::create(['name' => 'John']);
     $user->posts()->create(['title' => 'Hello']);
     return $user;
 }, $maxRetries = 3);
 
 // Read transaction (uses read replicas in cluster)
-$users = DB::connection('neo4j')->read(function ($connection) {
+$users = DB::connection('graph')->read(function ($connection) {
     return User::where('active', true)->get();
 }, $maxRetries = 2);
 ```
@@ -454,7 +454,7 @@ $users = User::with(['posts' => fn($q) => $q->where('published', true)])->get();
 
 ```php
 // Create indexes for frequently queried properties
-Schema::connection('neo4j')->table('users', function ($table) {
+Schema::connection('graph')->table('users', function ($table) {
     $table->index('email');
     $table->index('status');
     $table->unique('username');
@@ -589,11 +589,11 @@ class User extends Model
 }
 
 // After (Eloquent Cypher)
-use Look\EloquentCypher\Neo4JModel;
+use Look\EloquentCypher\GraphModel;
 
-class User extends Neo4JModel
+class User extends GraphModel
 {
-    protected $connection = 'neo4j';            // Change connection
+    protected $connection = 'graph';            // Change connection
     protected $fillable = ['name', 'email'];    // ✅ Same
     public $incrementing = false;               // Add this
     protected $keyType = 'int';                 // Add this if using integers
@@ -625,7 +625,6 @@ class User extends Neo4JModel
 - **Relationships**: See [relationships.md](relationships.md) for relationship setup
 
 ### For SQL Developers
-- **Migration Guide**: See [migration-guide.md](migration-guide.md) for SQL → Neo4j
 - **Concept Mapping**: Review section 1 of this guide frequently
 
 ### For Advanced Users
@@ -651,7 +650,6 @@ class User extends Neo4JModel
   - [Schema Introspection](schema-introspection.md)
   - [Arrays & JSON](arrays-and-json.md)
 - [Performance](performance.md)
-- [Migration Guide](migration-guide.md)
 - [Troubleshooting](troubleshooting.md)
 
 ---

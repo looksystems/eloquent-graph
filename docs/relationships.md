@@ -48,7 +48,7 @@ User::has('posts')->get(); // Existence queries
 
 Neo4j offers a unique choice: store relationships as **foreign key properties** (like SQL) or **native graph edges** (true Neo4j relationships). You control this at three levels:
 
-1. **Global**: `config('database.connections.neo4j.default_relationship_storage')`
+1. **Global**: `config('database.connections.graph.default_relationship_storage')`
 2. **Per Model**: `protected $useNativeRelationships = true`
 3. **Per Query**: `$user->posts()->useNativeEdges()->get()`
 
@@ -67,7 +67,7 @@ Choose how to store relationships based on your needs. All three modes support t
 'default_relationship_storage' => 'foreign_key'
 
 // Standard Eloquent relationship - no changes needed
-class User extends Neo4JModel
+class User extends GraphModel
 {
     public function posts()
     {
@@ -75,7 +75,7 @@ class User extends Neo4JModel
     }
 }
 
-class Post extends Neo4JModel
+class Post extends GraphModel
 {
     public function user()
     {
@@ -110,7 +110,7 @@ $post = $user->posts()->create(['title' => 'My Post']);
 'default_relationship_storage' => 'edge'
 
 // Or per-model
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $useNativeRelationships = true;
 
@@ -137,7 +137,7 @@ $posts = $user->posts()->useNativeEdges()->get();
 **Example with edge properties** (BelongsToMany):
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $useNativeRelationships = true;
 
@@ -214,7 +214,7 @@ Define one-to-many relationships exactly like Eloquent.
 ### Foreign Key Mode (Default)
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     public function posts()
     {
@@ -222,7 +222,7 @@ class User extends Neo4JModel
     }
 }
 
-class Post extends Neo4JModel
+class Post extends GraphModel
 {
     protected $fillable = ['title', 'content', 'user_id'];
 
@@ -247,7 +247,7 @@ $user = $post->user; // User model
 ### Native Edge Mode
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $useNativeRelationships = true;
 
@@ -257,7 +257,7 @@ class User extends Neo4JModel
     }
 }
 
-class Post extends Neo4JModel
+class Post extends GraphModel
 {
     protected $useNativeRelationships = true;
 
@@ -315,7 +315,7 @@ echo $users[0]->posts_count; // Integer
 One-to-one relationships for single related models.
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     public function profile()
     {
@@ -323,7 +323,7 @@ class User extends Neo4JModel
     }
 }
 
-class Profile extends Neo4JModel
+class Profile extends GraphModel
 {
     protected $fillable = ['bio', 'avatar_url', 'user_id'];
 
@@ -354,7 +354,7 @@ $user->profile()->delete();
 ### Native Edge Mode
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $useNativeRelationships = true;
 
@@ -377,7 +377,7 @@ $profile = $user->profile()->create(['bio' => 'Graph profile']);
 The inverse of hasMany and hasOne relationships.
 
 ```php
-class Post extends Neo4JModel
+class Post extends GraphModel
 {
     public function user()
     {
@@ -409,7 +409,7 @@ $post->save(); // user_id set to null
 ### Custom Keys
 
 ```php
-class Post extends Neo4JModel
+class Post extends GraphModel
 {
     public function author()
     {
@@ -430,7 +430,7 @@ Many-to-many relationships with optional pivot data.
 ### Foreign Key Mode (Pivot Nodes)
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     public function roles()
     {
@@ -439,7 +439,7 @@ class User extends Neo4JModel
     }
 }
 
-class Role extends Neo4JModel
+class Role extends GraphModel
 {
     public function users()
     {
@@ -462,7 +462,7 @@ $user->roles()->attach($role->id, ['expires_at' => now()->addYear()]);
 ### Native Edge Mode (Real Edges)
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $useNativeRelationships = true;
 
@@ -474,7 +474,7 @@ class User extends Neo4JModel
     }
 }
 
-class Role extends Neo4JModel
+class Role extends GraphModel
 {
     protected $useNativeRelationships = true;
 }
@@ -571,7 +571,7 @@ public function roles()
 Access distant relationships through intermediate models.
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     public function posts()
     {
@@ -585,7 +585,7 @@ class User extends Neo4JModel
     }
 }
 
-class Post extends Neo4JModel
+class Post extends GraphModel
 {
     public function user()
     {
@@ -598,7 +598,7 @@ class Post extends Neo4JModel
     }
 }
 
-class Comment extends Neo4JModel
+class Comment extends GraphModel
 {
     public function post()
     {
@@ -649,7 +649,7 @@ public function comments()
 With `useNativeRelationships`, through relationships use graph traversal:
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $useNativeRelationships = true;
 
@@ -672,7 +672,7 @@ class User extends Neo4JModel
 Single result through intermediate model.
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     public function posts()
     {
@@ -716,7 +716,7 @@ Relationships where a model can belong to multiple model types.
 ### MorphOne / MorphMany
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     public function avatar()
     {
@@ -729,7 +729,7 @@ class User extends Neo4JModel
     }
 }
 
-class Post extends Neo4JModel
+class Post extends GraphModel
 {
     public function featuredImage()
     {
@@ -742,7 +742,7 @@ class Post extends Neo4JModel
     }
 }
 
-class Image extends Neo4JModel
+class Image extends GraphModel
 {
     protected $fillable = ['url', 'imageable_id', 'imageable_type'];
 
@@ -775,7 +775,7 @@ $images = $post->images; // Collection of 3 Image models
 ### MorphTo
 
 ```php
-class Comment extends Neo4JModel
+class Comment extends GraphModel
 {
     protected $fillable = ['content', 'commentable_id', 'commentable_type'];
 
@@ -785,7 +785,7 @@ class Comment extends Neo4JModel
     }
 }
 
-class Post extends Neo4JModel
+class Post extends GraphModel
 {
     public function comments()
     {
@@ -793,7 +793,7 @@ class Post extends Neo4JModel
     }
 }
 
-class Video extends Neo4JModel
+class Video extends GraphModel
 {
     public function comments()
     {
@@ -882,7 +882,7 @@ Relation::morphMap([
 ### MorphToMany
 
 ```php
-class Post extends Neo4JModel
+class Post extends GraphModel
 {
     public function tags()
     {
@@ -890,7 +890,7 @@ class Post extends Neo4JModel
     }
 }
 
-class Video extends Neo4JModel
+class Video extends GraphModel
 {
     public function tags()
     {
@@ -898,7 +898,7 @@ class Video extends Neo4JModel
     }
 }
 
-class Tag extends Neo4JModel
+class Tag extends GraphModel
 {
     public function posts()
     {

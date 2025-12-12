@@ -6,16 +6,16 @@ Common issues and solutions when working with Eloquent Cypher.
 
 ```php
 // Check connection health
-DB::connection('neo4j')->ping(); // Returns true if healthy
+DB::connection('graph')->ping(); // Returns true if healthy
 
 // Debug generated queries
 $query = User::where('email', 'test@example.com');
 dd($query->toCypher()); // See raw Cypher query
 
 // Enable query logging
-DB::connection('neo4j')->enableQueryLog();
+DB::connection('graph')->enableQueryLog();
 User::all();
-dd(DB::connection('neo4j')->getQueryLog());
+dd(DB::connection('graph')->getQueryLog());
 ```
 
 ---
@@ -61,7 +61,7 @@ NEO4J_PASSWORD=password
 use Illuminate\Support\Facades\DB;
 
 // Health check
-if (DB::connection('neo4j')->ping()) {
+if (DB::connection('graph')->ping()) {
     echo "Connection successful!";
 } else {
     echo "Connection failed!";
@@ -235,7 +235,7 @@ User::where('settings', json_encode(['theme' => 'dark']))->get();
 User::whereIn('role', ['admin', 'editor'])->get();
 
 // ✅ CORRECT: Use model casts
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $casts = [
         'settings' => 'array',  // Auto JSON encode/decode
@@ -260,7 +260,7 @@ class User extends Neo4JModel
 
 ```php
 // ❌ WRONG: SQL syntax
-DB::connection('neo4j')->select('SELECT * FROM users');
+DB::connection('graph')->select('SELECT * FROM users');
 ```
 
 **Solutions**:
@@ -276,10 +276,10 @@ User::where('active', true)->get();
 
 ```php
 // ✅ CORRECT: Valid Cypher
-DB::connection('neo4j')->select('MATCH (n:users) RETURN n');
+DB::connection('graph')->select('MATCH (n:users) RETURN n');
 
 // ✅ CORRECT: Parameterized queries
-DB::connection('neo4j')->select(
+DB::connection('graph')->select(
     'MATCH (n:users) WHERE n.email = $email RETURN n',
     ['email' => 'test@example.com']
 );
@@ -305,7 +305,7 @@ DB::connection('neo4j')->select(
 **Problem**: Missing index on foreign key property.
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     public function posts()
     {
@@ -323,12 +323,12 @@ $user->posts; // WHERE n.user_id = 1
 
 ```php
 // In migration or Schema builder
-Schema::connection('neo4j')->table('posts', function ($table) {
+Schema::connection('graph')->table('posts', function ($table) {
     $table->index('user_id'); // Critical for performance!
 });
 
 // Or via raw Cypher
-DB::connection('neo4j')->statement(
+DB::connection('graph')->statement(
     'CREATE INDEX post_user_id IF NOT EXISTS FOR (n:posts) ON (n.user_id)'
 );
 ```
@@ -336,7 +336,7 @@ DB::connection('neo4j')->statement(
 ✅ **Use native edges** (alternative):
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     public function posts()
     {
@@ -364,7 +364,7 @@ $user->roles()->attach($role->id);
 ✅ **Ensure pivot table exists** (foreign key mode):
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     public function roles()
     {
@@ -374,7 +374,7 @@ class User extends Neo4JModel
 }
 
 // Create pivot records
-Schema::connection('neo4j')->create('role_user', function ($table) {
+Schema::connection('graph')->create('role_user', function ($table) {
     $table->id();
     $table->unsignedBigInteger('user_id')->index();
     $table->unsignedBigInteger('role_id')->index();
@@ -385,7 +385,7 @@ Schema::connection('neo4j')->create('role_user', function ($table) {
 ✅ **Or use native edges**:
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     public function roles()
     {
@@ -438,7 +438,7 @@ $users = User::with(['posts' => function ($query) {
 ✅ **Check relationship definition**:
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     public function posts()
     {
@@ -462,7 +462,7 @@ class User extends Neo4JModel
 
 ```php
 // In migration
-Schema::connection('neo4j')->table('users', function ($table) {
+Schema::connection('graph')->table('users', function ($table) {
     $table->index('email');
     $table->index('status');
     $table->unique('username');
@@ -525,7 +525,7 @@ DB::transaction(function () {
 
 ```php
 // ✅ CORRECT: Automatic retry on transient errors
-DB::connection('neo4j')->write(function ($tx) {
+DB::connection('graph')->write(function ($tx) {
     User::create(['name' => 'John']);
 }, [
     'max_retry_time' => 30,     // 30 seconds max retry
@@ -540,7 +540,7 @@ DB::connection('neo4j')->write(function ($tx) {
 ```php
 // ✅ Process in chunks
 $items->chunk(100, function ($chunk) {
-    DB::connection('neo4j')->write(function () use ($chunk) {
+    DB::connection('graph')->write(function () use ($chunk) {
         User::insert($chunk->toArray());
     });
 });
@@ -607,13 +607,13 @@ User::select(['id', 'email', 'name'])->get();
 
 ```php
 // Enable logging
-DB::connection('neo4j')->enableQueryLog();
+DB::connection('graph')->enableQueryLog();
 
 // Run queries
 User::where('email', 'test@example.com')->first();
 
 // View logged queries
-$queries = DB::connection('neo4j')->getQueryLog();
+$queries = DB::connection('graph')->getQueryLog();
 dd($queries);
 
 /* Output:
@@ -764,7 +764,7 @@ View logs in `storage/logs/laravel.log`.
 
 ✅ Neo4j is running (`docker ps`)
 ✅ Correct credentials in `.env`
-✅ Connection successful (`DB::connection('neo4j')->ping()`)
+✅ Connection successful (`DB::connection('graph')->ping()`)
 ✅ Indexes on foreign keys
 ✅ Proper node prefix (`n.`) in `selectRaw()`
 ✅ Using Cypher operators (`<>` not `!=`)
@@ -779,7 +779,7 @@ View logs in `storage/logs/laravel.log`.
 
 If stuck, search or create an issue:
 
-**Repository**: https://github.com/yourusername/eloquent-cypher
+**Repository**: https://github.com/looksystems/eloquent-cypher
 
 **Include**:
 - Laravel version
@@ -800,7 +800,6 @@ For deeper understanding:
 - **Relationships**: `docs/relationships.md`
 - **Query building**: `docs/querying.md`
 - **Performance tips**: `docs/performance.md`
-- **Migration guide**: `docs/migration-guide.md`
 - **Quick reference**: `docs/quick-reference.md`
 
 ---

@@ -1068,7 +1068,7 @@ class SchemaApiController extends Controller
     public function labels()
     {
         $labels = Neo4jSchema::getAllLabels();
-        $connection = app('db')->connection('neo4j');
+        $connection = app('db')->connection('graph');
 
         $data = [];
         foreach ($labels as $label) {
@@ -1106,7 +1106,7 @@ class SchemaApiController extends Controller
     public function relationships()
     {
         $types = Neo4jSchema::getAllRelationshipTypes();
-        $connection = app('db')->connection('neo4j');
+        $connection = app('db')->connection('graph');
 
         $data = [];
         foreach ($types as $type) {
@@ -1399,5 +1399,4 @@ class LazySchemaLoader
 
 - [Multi-Label Nodes](multi-label-nodes.md) - Working with multiple labels
 - [Performance Optimization](performance.md) - Query optimization techniques
-- [Migration Guide](migration-guide.md) - Migrating and managing schema changes
 - [Quick Reference](quick-reference.md) - Command cheat sheet

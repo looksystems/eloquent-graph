@@ -1,14 +1,15 @@
 # Eloquent Cypher - Graph Database for Laravel
 
-> **NOTE**: This is an experimental/learning ai coding project only and is under active development.
+> [!WARNING]
+> This is an experimental/learning ai coding project only and is under active development.
 
 [![Latest Version](https://img.shields.io/packagist/v/looksystems/eloquent-cypher.svg)](https://packagist.org/packages/looksystems/eloquent-cypher)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-1442%20passing%20%2B%2028%20skipped-brightgreen.svg)](#testing)
+[![Tests](https://img.shields.io/badge/tests-1513%20passing%20%2B%2028%20skipped-brightgreen.svg)](#testing)
 [![Laravel 10.x-12.x](https://img.shields.io/badge/Laravel-10.x--12.x-FF2D20.svg)](https://laravel.com)
 [![PHP 8.0+](https://img.shields.io/badge/PHP-8.0%2B-777BB4.svg)](https://php.net)
 
-**A production-ready graph database adapter that's a true drop-in replacement for Laravel Eloquent.**
+**A graph database adapter that's a true drop-in replacement for Laravel Eloquent.**
 
 Switch your Laravel application from MySQL/PostgreSQL to graph databases with zero code changes. Keep using the Eloquent API you know and love while gaining the power of graph databases.
 
@@ -19,7 +20,7 @@ Switch your Laravel application from MySQL/PostgreSQL to graph databases with ze
 - **Apache AGE** - Coming soon
 - **Custom Drivers** - Extensible driver architecture
 
-## 🚀 Status: Production Ready
+## 🚀 Status
 
 - **1,513 tests** - 100% functional compatibility
 - **24,000+ assertions** - Comprehensive test coverage
@@ -33,7 +34,7 @@ Switch your Laravel application from MySQL/PostgreSQL to graph databases with ze
 - **Hybrid Array Storage** - Intelligent storage of arrays as native types or JSON (APOC optional)
 - **Schema Introspection** - Explore your graph structure via Facade API or 7 artisan commands
 - **Graph database superpowers** - Full graph capabilities alongside Eloquent
-- **Feature complete** - Including select, addSelect, cursor, whereHas, doesntHave, chunk, lazy, increment, etc.
+- **Feature complete** - select, addSelect, cursor, whereHas, doesntHave, chunk, lazy, increment, etc.
 
 ## 📦 Installation
 
@@ -121,7 +122,7 @@ GRAPH_ENABLE_BATCH_EXECUTION=true
 GRAPH_RELATIONSHIP_STORAGE=hybrid
 ```
 
-> **See also:** [CONFIGURATION.md](CONFIGURATION.md) for comprehensive configuration guide
+> **See also:** [Configuration Guide](specs/CONFIGURATION.md) for comprehensive configuration guide
 
 ## 🏃 Quick Start
 
@@ -525,7 +526,7 @@ User::match()
 - **Macros**: Create reusable query patterns
 - **Backward Compatible**: Existing raw Cypher usage unchanged
 
-See [DSL_USAGE_GUIDE.md](DSL_USAGE_GUIDE.md) for comprehensive documentation.
+See [DSL Usage Guide](specs/DSL_USAGE_GUIDE.md) for comprehensive documentation.
 
 ### 🔥 Neo4j-Specific Features
 
@@ -632,8 +633,6 @@ DriverManager::register('memgraph', MemgraphDriver::class);
 - Implement `GraphDriverInterface`
 - Provide `ResultSetInterface`, `TransactionInterface`, `CapabilitiesInterface`, `SchemaIntrospectorInterface`
 - Register with `DriverManager::register()`
-
-See [DRIVER_IMPLEMENTATION_GUIDE.md](docs/DRIVER_IMPLEMENTATION_GUIDE.md) for detailed instructions on creating custom drivers.
 
 ## ✨ Features
 
@@ -743,17 +742,18 @@ See [DRIVER_IMPLEMENTATION_GUIDE.md](docs/DRIVER_IMPLEMENTATION_GUIDE.md) for de
 
 ## 📚 Documentation
 
-- **[QUICKSTART.md](QUICKSTART.md)** - Get up and running quickly
-- **[CONFIGURATION.md](CONFIGURATION.md)** - Comprehensive configuration guide
-- **[DSL_USAGE_GUIDE.md](DSL_USAGE_GUIDE.md)** - Cypher DSL query builder guide
-- **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute
+- **[Quick Start Guide](docs/QUICKSTART.md)** - Get up and running quickly
+- **[Configuration Guide](specs/CONFIGURATION.md)** - Comprehensive configuration guide
+- **[DSL Usage Guide](specs/DSL_USAGE_GUIDE.md)** - Cypher DSL query builder guide
+- **[User Documentation](docs/index.md)** - Complete user documentation
+- **[Contributing Guide](specs/CONTRIBUTING.md)** - How to contribute
 
 ## 🎯 Why Choose Eloquent Cypher?
 
 1. **Zero Learning Curve** - If you know Eloquent, you know this
 2. **Easy Migration** - Switch from SQL to graph databases without rewriting code
 3. **Best of Both Worlds** - Eloquent's simplicity with graph database power
-4. **Production Ready** - Comprehensive test coverage (1,513 tests) and battle-tested
+4. **Test Coverage** - Comprehensive test coverage (1,513 tests)
 5. **True Compatibility** - Not a "similar API" - it IS Eloquent
 6. **Multi-Database Support** - Pluggable driver architecture for Neo4j, Memgraph, Apache AGE
 7. **Native Graph Support** - Choose between foreign keys or real graph edges per relationship
@@ -766,7 +766,7 @@ See [DRIVER_IMPLEMENTATION_GUIDE.md](docs/DRIVER_IMPLEMENTATION_GUIDE.md) for de
 - **cursor() method** - Requires PDO streaming which Neo4j doesn't support (use lazy() instead)
 - **JSON operations** - Optional: APOC plugin enhances nested JSON queries (all tests pass with or without APOC)
 
-See [docs/missing-functionality-analysis.md](docs/missing-functionality-analysis.md) for detailed explanations.
+See [Limitations](docs/LIMITATIONS.md) for detailed explanations.
 
 ## 📊 Compatibility Matrix
 
@@ -774,13 +774,11 @@ For a comprehensive method-by-method comparison between Laravel Eloquent and thi
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on:
+We welcome contributions! Please see [Contributing Guide](specs/CONTRIBUTING.md) for details on:
 - Code of Conduct
 - Development process
 - How to submit pull requests
 - Coding standards
-
-For technical details about the codebase, see [docs/development/](docs/development/).
 
 ## 🧪 Testing
 
@@ -798,7 +796,7 @@ cp phpunit.xml phpunit.xml.dist
 ./vendor/bin/pest tests/Feature/BasicCrudTest.php
 ```
 
-**Note:** Tests require a Neo4j instance running on port 7688. Use the docker-compose.yml provided or customize ports as needed. See [QUICKSTART.md](QUICKSTART.md) for detailed setup.
+**Note:** Tests require a Neo4j instance running on port 7688. Use the docker-compose.yml provided or customize ports as needed. See the [Quick Start Guide](docs/QUICKSTART.md) for detailed setup.
 
 ## 📄 License
 

@@ -4,7 +4,7 @@ Welcome to Eloquent Cypher—a Laravel package that brings the full power of Elo
 
 ## What is Eloquent Cypher?
 
-Eloquent Cypher provides **100% Eloquent API compatibility** for Neo4j. Change your base class from `Model` to `Neo4JModel`, configure your connection, and everything else works identically:
+Eloquent Cypher provides **100% Eloquent API compatibility** for Neo4j. Change your base class from `Model` to `GraphModel`, configure your connection, and everything else works identically:
 
 ```php
 // Standard Eloquent
@@ -14,9 +14,9 @@ class User extends Model
 }
 
 // Eloquent Cypher - Same API, Different Database
-class User extends Neo4JModel
+class User extends GraphModel
 {
-    protected $connection = 'neo4j';
+    protected $connection = 'graph';
     protected $fillable = ['name', 'email'];
 }
 
@@ -76,11 +76,11 @@ The code is **identical**. Only the base class changes:
 
 ```php
 // app/Models/User.php (Eloquent Cypher)
-use Look\EloquentCypher\Neo4JModel;
+use Look\EloquentCypher\GraphModel;
 
-class User extends Neo4JModel
+class User extends GraphModel
 {
-    protected $connection = 'neo4j';
+    protected $connection = 'graph';
     protected $fillable = ['name', 'email', 'password'];
     protected $hidden = ['password'];
 
@@ -117,7 +117,7 @@ $alice->email = 'alice.smith@example.com';
 $alice->save();
 
 // Delete
-$alice->delete(); // Soft delete if using Neo4jSoftDeletes trait
+$alice->delete(); // Soft delete if using GraphSoftDeletes trait
 $alice->forceDelete(); // Permanent deletion
 
 // Relationships (100% Eloquent API)
@@ -139,7 +139,7 @@ User::where('created_at', '<', now()->subDays(30))->chunk(100, function ($users)
 
 ```php
 // Multi-label nodes (organize and optimize queries)
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $labels = ['Person', 'Individual']; // Node is :users:Person:Individual
 }
@@ -166,13 +166,13 @@ $shortestPath = $user->matchFrom()
 // Managed transactions with automatic retry
 use Illuminate\Support\Facades\DB;
 
-DB::connection('neo4j')->write(function ($tx) use ($user, $amount) {
+DB::connection('graph')->write(function ($tx) use ($user, $amount) {
     // Write transaction with automatic retry on transient errors
     $user->increment('balance', $amount);
     Transaction::create(['user_id' => $user->id, 'amount' => $amount]);
 }, maxRetries: 5);
 
-DB::connection('neo4j')->read(function ($tx) {
+DB::connection('graph')->read(function ($tx) {
     // Read-only transaction (routed to read replicas if configured)
     return User::with('friends')->where('active', true)->get();
 });
@@ -188,7 +188,7 @@ DB::connection('neo4j')->read(function ($tx) {
 ✅ **Relationships**: `hasMany()`, `hasOne()`, `belongsTo()`, `belongsToMany()`, `hasManyThrough()`, `hasOneThrough()`, `morphMany()`, `morphTo()`, `morphToMany()`
 ✅ **Eager Loading**: `with()`, `load()`, `loadMissing()`, `withCount()`, `loadCount()`
 ✅ **Timestamps**: Automatic `created_at` and `updated_at`
-✅ **Soft Deletes**: `Neo4jSoftDeletes` trait with `deleted_at`, `withTrashed()`, `restore()`
+✅ **Soft Deletes**: `GraphSoftDeletes` trait with `deleted_at`, `withTrashed()`, `restore()`
 ✅ **Attribute Casting**: `int`, `string`, `bool`, `array`, `json`, `datetime`, `encrypted`, custom casters
 ✅ **Mutators & Accessors**: `getAttribute`, `setAttribute`, modern attribute classes
 ✅ **Mass Assignment**: `$fillable`, `$guarded` protection
@@ -226,7 +226,6 @@ If you're already comfortable with Eloquent, jump to specific topics:
 
 - **[Neo4j Features Overview](neo4j-overview.md)** - Multi-labels, Cypher DSL, schema introspection, Neo4j aggregates
 - **[Performance](performance.md)** - Batch operations, managed transactions, indexing strategies
-- **[Migration Guide](migration-guide.md)** - Step-by-step migration from SQL to Neo4j
 - **[Troubleshooting](troubleshooting.md)** - Common issues, debugging techniques, solutions
 - **[Quick Reference](quick-reference.md)** - Cheat sheets, comparison tables, configuration reference
 
@@ -242,8 +241,7 @@ If you're already comfortable with Eloquent, jump to specific topics:
 - **[Neo4j Features Overview](neo4j-overview.md)** - Multi-label nodes, Neo4j aggregates, Cypher DSL, schema introspection
 - **[Performance](performance.md)** - Batch operations (70% faster), managed transactions, indexing, connection pooling
 
-**Migration & Support** (Get Unstuck):
-- **[Migration Guide](migration-guide.md)** - Incremental migration strategy, model conversion, data import, gotchas
+**Support** (Get Unstuck):
 - **[Troubleshooting](troubleshooting.md)** - Connection issues, query problems, debugging techniques, getting help
 - **[Quick Reference](quick-reference.md)** - Concept mapping, common patterns, configuration options, Artisan commands
 
@@ -255,7 +253,7 @@ If you're already comfortable with Eloquent, jump to specific topics:
 
 **Not Just Query Translation**: Native Neo4j features (multi-labels, native edges, Cypher DSL, percentile aggregates) when you need them, standard Eloquent when you don't.
 
-**Production-Ready**: Comprehensive test suite (500+ tests), battle-tested in real applications, Laravel 10-12 support.
+**Production-Ready**: Comprehensive test suite (1,513 tests), battle-tested in real applications, Laravel 10-12 support.
 
 ## Core Design Decisions
 
@@ -283,8 +281,6 @@ This guide focuses on **using** Eloquent Cypher. For deeper topics, see:
 **New to Graph Databases?** Start with **[Getting Started](getting-started.md)** for installation and your first working model.
 
 **Experienced with Eloquent?** Jump to **[Neo4j Features Overview](neo4j-overview.md)** to see what's possible beyond standard Eloquent.
-
-**Migrating from SQL?** See the **[Migration Guide](migration-guide.md)** for a step-by-step conversion strategy.
 
 **Need Quick Answers?** Check the **[Quick Reference](quick-reference.md)** for cheat sheets and comparison tables.
 

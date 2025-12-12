@@ -41,7 +41,7 @@ Register the service provider in `config/app.php`:
 ```php
 'providers' => [
     // Other Service Providers
-    Look\EloquentCypher\Neo4jServiceProvider::class,
+    Look\EloquentCypher\GraphServiceProvider::class,
 ],
 ```
 
@@ -144,32 +144,34 @@ You should see the message returned.
 
 ### Step 1: Update .env
 
-Add your Neo4j connection details to `.env`:
+Add your graph database connection details to `.env`:
 
 ```env
-NEO4J_HOST=localhost
-NEO4J_PORT=7688
-NEO4J_USERNAME=neo4j
-NEO4J_PASSWORD=password
-NEO4J_DATABASE=neo4j
+GRAPH_DATABASE_TYPE=neo4j
+GRAPH_HOST=localhost
+GRAPH_PORT=7688
+GRAPH_USERNAME=neo4j
+GRAPH_PASSWORD=password
+GRAPH_DATABASE=neo4j
 ```
 
 ### Step 2: Configure Database Connection
 
-Add the `neo4j` connection to `config/database.php` in the `connections` array:
+Add the `graph` connection to `config/database.php` in the `connections` array:
 
 ```php
 'connections' => [
 
     // Your existing connections (mysql, pgsql, etc.)
 
-    'neo4j' => [
-        'driver' => 'neo4j',
-        'host' => env('NEO4J_HOST', 'localhost'),
-        'port' => env('NEO4J_PORT', 7688),
-        'database' => env('NEO4J_DATABASE', 'neo4j'),
-        'username' => env('NEO4J_USERNAME', 'neo4j'),
-        'password' => env('NEO4J_PASSWORD', 'password'),
+    'graph' => [
+        'driver' => 'graph',
+        'database_type' => env('GRAPH_DATABASE_TYPE', 'neo4j'),
+        'host' => env('GRAPH_HOST', 'localhost'),
+        'port' => env('GRAPH_PORT', 7688),
+        'database' => env('GRAPH_DATABASE', 'neo4j'),
+        'username' => env('GRAPH_USERNAME', 'neo4j'),
+        'password' => env('GRAPH_PASSWORD', 'password'),
 
         // Performance Settings (Optional - Recommended)
         'batch_size' => 100,
@@ -190,7 +192,8 @@ Add the `neo4j` connection to `config/database.php` in the `connections` array:
 
 **Configuration Options Explained:**
 
-- `driver`: Must be `'neo4j'`
+- `driver`: Must be `'graph'`
+- `database_type`: The graph database driver (e.g., `'neo4j'`)
 - `host`: Neo4j server address
 - `port`: Bolt protocol port (default: 7688 in this guide)
 - `database`: Database name (usually `'neo4j'`)
@@ -238,11 +241,11 @@ class User extends Model
 
 namespace App\Models;
 
-use Look\EloquentCypher\Neo4JModel;
+use Look\EloquentCypher\GraphModel;
 
-class User extends Neo4JModel
+class User extends GraphModel
 {
-    protected $connection = 'neo4j';
+    protected $connection = 'graph';
     protected $fillable = ['name', 'email', 'age'];
 
     public function posts()
@@ -253,8 +256,8 @@ class User extends Neo4JModel
 ```
 
 **What Changed:**
-1. Base class: `Model` → `Neo4JModel`
-2. Added: `protected $connection = 'neo4j';`
+1. Base class: `Model` → `GraphModel`
+2. Added: `protected $connection = 'graph';`
 
 **What Stayed the Same:**
 Everything else! Properties, relationships, methods all work identically.
@@ -266,11 +269,11 @@ Everything else! Properties, relationships, methods all work identically.
 
 namespace App\Models;
 
-use Look\EloquentCypher\Neo4JModel;
+use Look\EloquentCypher\GraphModel;
 
-class Post extends Neo4JModel
+class Post extends GraphModel
 {
-    protected $connection = 'neo4j';
+    protected $connection = 'graph';
     protected $fillable = ['title', 'content', 'user_id'];
 
     public function user()
@@ -459,14 +462,14 @@ protected $keyType = 'int';
 
 **Soft Deletes:**
 ```php
-// Use the Neo4j-specific trait
-use Look\EloquentCypher\Concerns\Neo4jSoftDeletes;
+// Use the graph-specific trait
+use Look\EloquentCypher\Concerns\GraphSoftDeletes;
 
-class User extends Neo4JModel
+class User extends GraphModel
 {
-    use Neo4jSoftDeletes;
+    use GraphSoftDeletes;
 
-    protected $connection = 'neo4j';
+    protected $connection = 'graph';
 }
 
 // Usage is identical to Laravel's SoftDeletes
@@ -484,7 +487,7 @@ $users = User::selectRaw('n.age * 2 as double_age')->get();
 // For complex Cypher queries
 use Illuminate\Support\Facades\DB;
 
-$results = DB::connection('neo4j')->cypher(
+$results = DB::connection('graph')->cypher(
     'MATCH (u:users)-[:POSTED]->(p:posts) WHERE u.age > $age RETURN u, p LIMIT 10',
     ['age' => 25]
 );
@@ -523,7 +526,7 @@ docker logs neo4j-test
 
 ### Class Not Found
 
-**Problem:** `Neo4JModel` class not found
+**Problem:** `GraphModel` class not found
 
 **Solutions:**
 ```bash
@@ -542,11 +545,11 @@ composer show looksystems/eloquent-cypher
 
 **Solutions:**
 - Verify Neo4j is running (see "Connection Refused" above)
-- Check connection name matches in model: `protected $connection = 'neo4j';`
+- Check connection name matches in model: `protected $connection = 'graph';`
 - Test connection in tinker:
 ```php
 php artisan tinker
-DB::connection('neo4j')->getPdo();  // Should not throw error
+DB::connection('graph')->getPdo();  // Should not throw error
 ```
 
 ---
@@ -564,9 +567,6 @@ You're now ready to build with Eloquent Cypher! Here's what to explore next:
 
 **Performance:**
 - [Performance Guide](performance.md) - Optimize your queries and operations
-
-**Migration:**
-- [Migration Guide](migration-guide.md) - Moving from MySQL/PostgreSQL
 
 **Reference:**
 - [Quick Reference](quick-reference.md) - Cheat sheets and tables

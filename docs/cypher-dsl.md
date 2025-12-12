@@ -29,7 +29,7 @@ The Cypher DSL is a **type-safe, fluent query builder** for Neo4j that brings La
 **Traditional raw Cypher:**
 ```php
 // String manipulation, no type safety, injection risks
-$results = DB::connection('neo4j')->cypher(
+$results = DB::connection('graph')->cypher(
     'MATCH (n:users) WHERE n.age > ' . $age . ' RETURN n'
 );
 ```
@@ -111,15 +111,15 @@ The DSL is automatically available - no additional setup required!
 
 ### The HasCypherDsl Trait
 
-Every `Neo4JModel` automatically includes DSL support:
+Every `GraphModel` automatically includes DSL support:
 
 ```php
-use Look\EloquentCypher\Neo4JModel;
+use Look\EloquentCypher\GraphModel;
 use Look\EloquentCypher\Traits\HasCypherDsl;
 
-class User extends Neo4JModel
+class User extends GraphModel
 {
-    use HasCypherDsl; // Already included in Neo4JModel
+    use HasCypherDsl; // Already included in GraphModel
 
     protected $table = 'users';
 }
@@ -137,7 +137,7 @@ Let's compare raw Cypher with the DSL:
 use WikibaseSolutions\CypherDSL\Query;
 
 // Raw Cypher (still works!)
-$rawResults = DB::connection('neo4j')->cypher(
+$rawResults = DB::connection('graph')->cypher(
     'MATCH (n:users) WHERE n.age > $age RETURN n',
     ['age' => 25]
 );
@@ -231,7 +231,7 @@ $users = User::match()
 // MATCH (n:users) RETURN n
 
 // Match from connection (no automatic model hydration)
-$results = DB::connection('neo4j')->cypher()
+$results = DB::connection('graph')->cypher()
     ->match(Query::node('users')->named('u'))
     ->returning(Query::variable('u'))
     ->get();
@@ -239,7 +239,7 @@ $results = DB::connection('neo4j')->cypher()
 // Returns Collection<stdClass>
 
 // Match multiple node types
-$results = DB::connection('neo4j')->cypher()
+$results = DB::connection('graph')->cypher()
     ->match([
         Query::node('users')->named('u'),
         Query::node('posts')->named('p')
@@ -414,7 +414,7 @@ $users = User::match()
 
 // Parameter - value passed separately (safer)
 $minAge = $_GET['min_age'] ?? 18;
-$users = DB::connection('neo4j')->cypher()
+$users = DB::connection('graph')->cypher()
     ->match(Query::node('users')->named('n'))
     ->where(Query::variable('n')->property('age')->gt(Query::parameter('minAge')))
     ->withParameter('minAge', $minAge)
@@ -552,7 +552,7 @@ $friends = $user->matchFrom()
     ->get();
 
 // Two-hop pattern (requires manual DSL)
-$fof = DB::connection('neo4j')->cypher()
+$fof = DB::connection('graph')->cypher()
     ->match(
         Query::node('users')->named('user')
             ->withProperties(['id' => $user->id])
@@ -718,14 +718,14 @@ For more control, use raw DSL patterns:
 use WikibaseSolutions\CypherDSL\Query;
 
 // Friends within 2-3 hops
-$connections = DB::connection('neo4j')->cypher()
+$connections = DB::connection('graph')->cypher()
     ->raw('MATCH', 'path = (start:users {id: ' . $user->id . '})-[:KNOWS*2..3]-(end:users)')
     ->returning(Query::rawExpression('DISTINCT end'))
     ->get();
 // MATCH path = (start:users {id: 1})-[:KNOWS*2..3]-(end:users) RETURN DISTINCT end
 
 // Direction-specific variable-length
-$influences = DB::connection('neo4j')->cypher()
+$influences = DB::connection('graph')->cypher()
     ->raw('MATCH', '(start:users {id: ' . $user->id . '})-[:INFLUENCES*1..3]->(influenced:users)')
     ->returning(Query::variable('influenced'))
     ->get();
@@ -760,7 +760,7 @@ Match patterns that may or may not exist:
 use WikibaseSolutions\CypherDSL\Query;
 
 // Users with optional address data
-$results = DB::connection('neo4j')->cypher()
+$results = DB::connection('graph')->cypher()
     ->match(Query::node('users')->named('u'))
     ->raw('OPTIONAL MATCH', '(u)-[:HAS_ADDRESS]->(a:addresses)')
     ->returning([
@@ -780,7 +780,7 @@ Chain query parts with intermediate results:
 
 ```php
 // Find popular users, then their recent posts
-$results = DB::connection('neo4j')->cypher()
+$results = DB::connection('graph')->cypher()
     ->match(Query::node('users')->named('u'))
     ->where(Query::variable('u')->property('follower_count')->gt(Query::literal(1000)))
     ->raw('WITH', 'u')
@@ -807,7 +807,7 @@ Transform lists into rows:
 // Process array of IDs
 $userIds = [1, 2, 3, 4, 5];
 
-$results = DB::connection('neo4j')->cypher()
+$results = DB::connection('graph')->cypher()
     ->raw('UNWIND', '$ids AS userId')
     ->withParameter('ids', $userIds)
     ->match(Query::node('users')->named('u')->withProperties(['id' => Query::parameter('userId')]))
@@ -818,7 +818,7 @@ $results = DB::connection('neo4j')->cypher()
 // RETURN u
 
 // Generate computed rows
-$results = DB::connection('neo4j')->cypher()
+$results = DB::connection('graph')->cypher()
     ->raw('UNWIND', 'range(1, 10) AS x')
     ->returning([
         'number' => Query::rawExpression('x'),
@@ -835,7 +835,7 @@ Combine results from multiple queries:
 
 ```php
 // Get users and companies in one result set
-$query1 = DB::connection('neo4j')->cypher()
+$query1 = DB::connection('graph')->cypher()
     ->match(Query::node('users')->named('n'))
     ->returning([
         'name' => Query::variable('n')->property('name'),
@@ -843,7 +843,7 @@ $query1 = DB::connection('neo4j')->cypher()
     ])
     ->toCypher();
 
-$query2 = DB::connection('neo4j')->cypher()
+$query2 = DB::connection('graph')->cypher()
     ->match(Query::node('companies')->named('n'))
     ->returning([
         'name' => Query::variable('n')->property('name'),
@@ -851,7 +851,7 @@ $query2 = DB::connection('neo4j')->cypher()
     ])
     ->toCypher();
 
-$combined = DB::connection('neo4j')->cypher(
+$combined = DB::connection('graph')->cypher(
     $query1 . ' UNION ' . $query2
 );
 // MATCH (n:users) RETURN n.name AS name, 'user' AS type
@@ -878,7 +878,7 @@ $results = User::match()
 // RETURN n AS user, COUNT(p) AS post_count
 
 // Average age by status
-$results = DB::connection('neo4j')->cypher()
+$results = DB::connection('graph')->cypher()
     ->match(Query::node('users')->named('u'))
     ->returning([
         'status' => Query::variable('u')->property('status'),
@@ -896,7 +896,7 @@ Execute subqueries within a main query:
 
 ```php
 // Find users and their top 3 posts by views
-$results = DB::connection('neo4j')->cypher()
+$results = DB::connection('graph')->cypher()
     ->match(Query::node('users')->named('u'))
     ->raw('CALL', '{
         MATCH (u)-[:HAS_POST]->(p:posts)
@@ -922,7 +922,7 @@ $results = DB::connection('neo4j')->cypher()
 Models are automatically hydrated with casts applied:
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $casts = [
         'is_active' => 'boolean',
@@ -956,7 +956,7 @@ When returning multiple node types:
 
 ```php
 // Returns Collection<stdClass> with mixed data
-$results = DB::connection('neo4j')->cypher()
+$results = DB::connection('graph')->cypher()
     ->match(
         Query::node('users')->named('u')
             ->relationshipTo(Query::node('posts')->named('p'), ['HAS_POST'])
@@ -1162,7 +1162,7 @@ $users = User::match()->returning(Query::variable('n'))->get();
 
 ✅ **Use DISTINCT for uniqueness:**
 ```php
-$unique = DB::connection('neo4j')->cypher()
+$unique = DB::connection('graph')->cypher()
     ->match(Query::node('users')->named('u'))
     ->returning(Query::rawExpression('DISTINCT u.city AS city'))
     ->get();
@@ -1183,7 +1183,7 @@ $cypher = $builder->toCypher();
 // PROFILE MATCH (n:users) WHERE n.age > 25 RETURN n
 
 // Or via raw query
-$profile = DB::connection('neo4j')->cypher("PROFILE {$cypher}");
+$profile = DB::connection('graph')->cypher("PROFILE {$cypher}");
 ```
 
 ---
@@ -1232,7 +1232,7 @@ Calculate user influence score:
 
 ```php
 function calculateInfluenceScore(User $user) {
-    $stats = DB::connection('neo4j')->cypher()
+    $stats = DB::connection('graph')->cypher()
         ->match(Query::node('users')->named('u')->withProperties(['id' => $user->id]))
         ->raw('OPTIONAL MATCH', '(u)-[:FOLLOWS]->(following:users)')
         ->raw('OPTIONAL MATCH', '(follower:users)-[:FOLLOWS]->(u)')
@@ -1262,7 +1262,7 @@ Identify suspicious patterns:
 ```php
 function detectSuspiciousActivity() {
     // Find accounts with unusual relationship patterns
-    return DB::connection('neo4j')->cypher()
+    return DB::connection('graph')->cypher()
         ->match(Query::node('users')->named('u'))
         ->raw('OPTIONAL MATCH', '(u)-[:FRIENDS_WITH]->(friend:users)')
         ->raw('OPTIONAL MATCH', '(u)-[:PURCHASED]->(product:products)')
@@ -1281,7 +1281,7 @@ function detectSuspiciousActivity() {
 
 // Find circular payment patterns
 function detectCircularPayments(int $maxHops = 5) {
-    return DB::connection('neo4j')->cypher()
+    return DB::connection('graph')->cypher()
         ->raw('MATCH', 'path = (start:users)-[:PAID*2..' . $maxHops . ']->(start)')
         ->returning([
             'path' => Query::variable('path'),

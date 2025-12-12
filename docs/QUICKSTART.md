@@ -43,23 +43,25 @@ Note: You can customize the ports if 7688/7475 are already in use.
 
 Add to your `.env` file:
 ```env
-NEO4J_HOST=localhost
-NEO4J_PORT=7688
-NEO4J_USERNAME=neo4j
-NEO4J_PASSWORD=password
-NEO4J_DATABASE=neo4j
+GRAPH_DATABASE_TYPE=neo4j
+GRAPH_HOST=localhost
+GRAPH_PORT=7688
+GRAPH_USERNAME=neo4j
+GRAPH_PASSWORD=password
+GRAPH_DATABASE=neo4j
 ```
 
 Add to `config/database.php`:
 ```php
 'connections' => [
-    'neo4j' => [
-        'driver' => 'neo4j',
-        'host' => env('NEO4J_HOST', 'localhost'),
-        'port' => env('NEO4J_PORT', 7688),
-        'database' => env('NEO4J_DATABASE', 'neo4j'),
-        'username' => env('NEO4J_USERNAME', 'neo4j'),
-        'password' => env('NEO4J_PASSWORD', 'password'),
+    'graph' => [
+        'driver' => 'graph',
+        'database_type' => env('GRAPH_DATABASE_TYPE', 'neo4j'),
+        'host' => env('GRAPH_HOST', 'localhost'),
+        'port' => env('GRAPH_PORT', 7688),
+        'database' => env('GRAPH_DATABASE', 'neo4j'),
+        'username' => env('GRAPH_USERNAME', 'neo4j'),
+        'password' => env('GRAPH_PASSWORD', 'password'),
 
         // Performance Features (v1.2.0) - Optional but recommended
         'batch_size' => 100,                  // Batch size for bulk operations
@@ -82,11 +84,11 @@ Add to `config/database.php`:
 
 namespace App\Models;
 
-use Look\EloquentCypher\Neo4JModel;
+use Look\EloquentCypher\GraphModel;
 
-class User extends Neo4JModel
+class User extends GraphModel
 {
-    protected $connection = 'neo4j';
+    protected $connection = 'graph';
     protected $fillable = ['name', 'email', 'age'];
 
     public function posts()
@@ -101,11 +103,11 @@ class User extends Neo4JModel
 
 namespace App\Models;
 
-use Look\EloquentCypher\Neo4JModel;
+use Look\EloquentCypher\GraphModel;
 
-class Post extends Neo4JModel
+class Post extends GraphModel
 {
-    protected $connection = 'neo4j';
+    protected $connection = 'graph';
     protected $fillable = ['title', 'content', 'user_id'];
 
     public function user()
@@ -167,7 +169,7 @@ User::insert([
 // Managed transactions with automatic retry (optional upgrade)
 use Illuminate\Support\Facades\DB;
 
-DB::connection('neo4j')->write(function ($connection) {
+DB::connection('graph')->write(function ($connection) {
     $user = User::create(['name' => 'John']);
     $user->posts()->create(['title' => 'Post']);
     return $user;
@@ -245,7 +247,7 @@ When you need graph database power:
 
 ```php
 // Raw Cypher queries
-$results = DB::connection('neo4j')->cypher(
+$results = DB::connection('graph')->cypher(
     'MATCH (u:users {status: $status})-[:POSTED]->(p:posts)
      RETURN u, count(p) as post_count',
     ['status' => 'active']

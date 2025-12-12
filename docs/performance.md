@@ -124,9 +124,9 @@ User::query()->chunk(500, function ($users) {
 });
 
 // Good: Disable batching for real-time operations
-config(['database.connections.neo4j.enable_batch_execution' => false]);
+config(['database.connections.graph.enable_batch_execution' => false]);
 User::insert($singleRecord); // Immediate insertion
-config(['database.connections.neo4j.enable_batch_execution' => true]);
+config(['database.connections.graph.enable_batch_execution' => true]);
 
 // Good: Monitor batch performance
 $start = microtime(true);
@@ -153,7 +153,7 @@ Use `write()` for any data modification operations:
 use Illuminate\Support\Facades\DB;
 
 // Create user with posts - automatic retry on transient errors
-$userId = DB::connection('neo4j')->write(function ($connection) {
+$userId = DB::connection('graph')->write(function ($connection) {
     $user = User::create([
         'name' => 'Alice',
         'email' => 'alice@example.com',
@@ -180,7 +180,7 @@ Use `read()` for read-only operations - routes to read replicas in cluster:
 
 ```php
 // Analytics query - uses read replicas
-$stats = DB::connection('neo4j')->read(function ($connection) {
+$stats = DB::connection('graph')->read(function ($connection) {
     return [
         'total_users' => User::count(),
         'active_users' => User::where('active', true)->count(),
@@ -236,12 +236,12 @@ Override max retries for specific operations:
 
 ```php
 // Critical operation - more retries
-DB::connection('neo4j')->write(function ($connection) {
+DB::connection('graph')->write(function ($connection) {
     return $this->processPayment($orderId);
 }, $maxRetries = 5);
 
 // One-shot operation - no retries
-DB::connection('neo4j')->write(function ($connection) {
+DB::connection('graph')->write(function ($connection) {
     return $this->sendNotification($userId);
 }, $maxRetries = 1);
 ```
@@ -252,14 +252,14 @@ DB::connection('neo4j')->write(function ($connection) {
 
 ```php
 // Bad: Not idempotent (counter increments multiple times on retry)
-DB::connection('neo4j')->write(function () {
+DB::connection('graph')->write(function () {
     $user = User::find(1);
     $user->login_count++;  // Will increment 2-3 times on retry!
     $user->save();
 });
 
 // Good: Idempotent (same result regardless of retries)
-DB::connection('neo4j')->write(function () {
+DB::connection('graph')->write(function () {
     User::where('id', 1)->update([
         'last_login' => now(),
         'login_count' => DB::raw('n.login_count + 1'), // Neo4j handles increment
@@ -267,7 +267,7 @@ DB::connection('neo4j')->write(function () {
 });
 
 // Good: Use upsert patterns
-DB::connection('neo4j')->write(function () {
+DB::connection('graph')->write(function () {
     return User::updateOrCreate(
         ['email' => 'user@example.com'],
         ['name' => 'John Doe', 'last_seen' => now()]
@@ -284,7 +284,7 @@ use Look\EloquentCypher\Exceptions\Neo4jTransientException;
 use Look\EloquentCypher\Exceptions\Neo4jException;
 
 try {
-    $result = DB::connection('neo4j')->write(function () {
+    $result = DB::connection('graph')->write(function () {
         return $this->criticalOperation();
     });
 
@@ -312,13 +312,13 @@ Managed transactions include automatic health checks:
 
 ```php
 // Manual health check
-if (!DB::connection('neo4j')->ping()) {
+if (!DB::connection('graph')->ping()) {
     Log::warning('Neo4j connection unhealthy');
-    DB::connection('neo4j')->reconnect();
+    DB::connection('graph')->reconnect();
 }
 
 // Automatic health check in transactions
-DB::connection('neo4j')->write(function () {
+DB::connection('graph')->write(function () {
     // Connection automatically checked and reconnected if needed
     return User::create(['name' => 'John']);
 });
@@ -335,7 +335,7 @@ DB::transaction(function () {
 }, $attempts = 5);
 
 // Managed transaction (Neo4j-optimized)
-DB::connection('neo4j')->write(function ($connection) {
+DB::connection('graph')->write(function ($connection) {
     User::create(['name' => 'Jane']);
 }, $maxRetries = 3);
 ```
@@ -361,17 +361,17 @@ Use Laravel's schema builder with Neo4j syntax:
 use Illuminate\Support\Facades\Schema;
 
 // Create index on users.email
-Schema::connection('neo4j')->label('users', function ($label) {
+Schema::connection('graph')->label('users', function ($label) {
     $label->index('email');
 });
 
 // Create composite index
-Schema::connection('neo4j')->label('posts', function ($label) {
+Schema::connection('graph')->label('posts', function ($label) {
     $label->index(['user_id', 'created_at']);
 });
 
 // Create fulltext index (Neo4j 5.0+)
-Schema::connection('neo4j')->label('articles', function ($label) {
+Schema::connection('graph')->label('articles', function ($label) {
     $label->fulltext(['title', 'content'], 'article_search');
 });
 ```
@@ -382,17 +382,17 @@ Constraints enforce data integrity and create indexes automatically:
 
 ```php
 // Unique constraint (also creates index)
-Schema::connection('neo4j')->label('users', function ($label) {
+Schema::connection('graph')->label('users', function ($label) {
     $label->unique('email');
 });
 
 // Node key constraint (composite unique)
-Schema::connection('neo4j')->label('products', function ($label) {
+Schema::connection('graph')->label('products', function ($label) {
     $label->nodeKey(['sku', 'warehouse_id']);
 });
 
 // Existence constraint (property must exist)
-Schema::connection('neo4j')->label('orders', function ($label) {
+Schema::connection('graph')->label('orders', function ($label) {
     $label->required('customer_id');
 });
 ```
@@ -401,13 +401,13 @@ Schema::connection('neo4j')->label('orders', function ($label) {
 
 ```php
 // Drop index by name
-Schema::connection('neo4j')->dropIndex('users_email_index');
+Schema::connection('graph')->dropIndex('users_email_index');
 
 // Drop constraint by name
-Schema::connection('neo4j')->dropConstraint('users_email_unique');
+Schema::connection('graph')->dropConstraint('users_email_unique');
 
 // Drop all indexes/constraints for a label
-Schema::connection('neo4j')->dropLabel('old_users');
+Schema::connection('graph')->dropLabel('old_users');
 ```
 
 ### Index Strategy for Relationships
@@ -416,12 +416,12 @@ Schema::connection('neo4j')->dropLabel('old_users');
 
 ```php
 // Index foreign keys for fast relationship queries
-Schema::connection('neo4j')->label('posts', function ($label) {
+Schema::connection('graph')->label('posts', function ($label) {
     $label->index('user_id');      // For $user->posts()
     $label->index('category_id');  // For $category->posts()
 });
 
-Schema::connection('neo4j')->label('comments', function ($label) {
+Schema::connection('graph')->label('comments', function ($label) {
     $label->index('post_id');      // For $post->comments()
     $label->index('user_id');      // For $user->comments()
 });
@@ -440,7 +440,7 @@ $posts = $user->posts()->get(); // Fast without indexes!
 ```php
 // Index foreign keys even though edges exist
 // Allows query optimizer to choose best path
-Schema::connection('neo4j')->label('posts', function ($label) {
+Schema::connection('graph')->label('posts', function ($label) {
     $label->index('user_id');
 });
 ```
@@ -470,7 +470,7 @@ Schema::connection('neo4j')->label('posts', function ($label) {
 
 ```php
 // Get all indexes for a connection
-$indexes = DB::connection('neo4j')->select('SHOW INDEXES');
+$indexes = DB::connection('graph')->select('SHOW INDEXES');
 
 // Get indexes for specific label
 $userIndexes = collect($indexes)
@@ -478,7 +478,7 @@ $userIndexes = collect($indexes)
     ->all();
 
 // Check if index exists
-Schema::connection('neo4j')->hasIndex('users_email_index');
+Schema::connection('graph')->hasIndex('users_email_index');
 ```
 
 ---
@@ -538,9 +538,9 @@ Connection pools include automatic health monitoring:
 
 ```php
 // Manual health check
-if (!DB::connection('neo4j')->ping()) {
+if (!DB::connection('graph')->ping()) {
     Log::warning('Connection unhealthy, reconnecting...');
-    DB::connection('neo4j')->reconnect();
+    DB::connection('graph')->reconnect();
 }
 
 // Pool automatically validates connections using validation_query
@@ -650,7 +650,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 DB::listen(function ($query) {
-    if ($query->connectionName === 'neo4j') {
+    if ($query->connectionName === 'graph') {
         Log::debug('Neo4j Query', [
             'cypher' => $query->sql,
             'bindings' => $query->bindings,
@@ -675,7 +675,6 @@ Configure slow query logging in `config/database.php`:
 
 **Continue Learning**:
 - [Troubleshooting Guide](troubleshooting.md) - Debug performance issues and errors
-- [Migration Guide](migration-guide.md) - Optimize during SQL-to-Neo4j migration
 
 **Related Topics**:
 - [Models and CRUD](models-and-crud.md) - Basic model operations

@@ -75,9 +75,9 @@ Use Laravel's familiar `$casts` property to define array attributes.
 ### Basic Array Casting
 
 ```php
-use Look\EloquentCypher\Neo4JModel;
+use Look\EloquentCypher\GraphModel;
 
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $casts = [
         'tags' => 'array',        // For nested/associative arrays
@@ -104,7 +104,7 @@ $skills = $user->skills;    // Returns: ['frontend' => 'vue']
 For complex nested structures, use explicit `json` casting:
 
 ```php
-class Post extends Neo4JModel
+class Post extends GraphModel
 {
     protected $casts = [
         'metadata' => 'json',
@@ -156,7 +156,7 @@ Choose the right storage strategy based on your data structure and query needs.
 
 **Example**:
 ```php
-class Article extends Neo4JModel
+class Article extends GraphModel
 {
     // No cast needed - automatically detected as flat
     protected $fillable = ['title', 'tags'];
@@ -186,7 +186,7 @@ Article::whereJsonContains('tags', 'laravel')->get();
 
 **Example**:
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $casts = [
         'preferences' => 'json',
@@ -225,7 +225,7 @@ $user->update([
 
 **✅ Correct Approach** (use relationships):
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     public function posts()
     {
@@ -263,7 +263,7 @@ Post::whereJsonContains('metadata->author->social->twitter', '@johndoe')->get();
 ### Querying Arrays Within JSON
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $casts = [
         'settings' => 'json',
@@ -467,7 +467,7 @@ APOC (Awesome Procedures on Cypher) enhances JSON operations. Eloquent Cypher au
 
 ```php
 // Check if APOC is available
-$hasApoc = DB::connection('neo4j')->hasApoc();
+$hasApoc = DB::connection('graph')->hasApoc();
 
 if ($hasApoc) {
     // Use advanced JSON queries
@@ -598,7 +598,7 @@ Understand the performance implications of different storage strategies.
 **1. Use Native LISTs for Hot Paths**:
 ```php
 // Fast queries
-class Article extends Neo4JModel
+class Article extends GraphModel
 {
     // tags stored as native LIST
     protected $fillable = ['title', 'tags'];
@@ -641,7 +641,7 @@ While Neo4j doesn't natively index JSON properties, strategies exist to improve 
 
 **Extract to Properties**:
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $casts = [
         'settings' => 'json',
@@ -678,7 +678,7 @@ User::whereJsonContains('settings->theme', 'dark')->get();
 
 **Hybrid Approach**:
 ```php
-class Post extends Neo4JModel
+class Post extends GraphModel
 {
     protected $fillable = [
         'title',
@@ -743,13 +743,13 @@ Patterns for effective array and JSON usage in Neo4j.
 
 ```php
 // ✅ Good: Simple arrays as native LISTs
-class Article extends Neo4JModel
+class Article extends GraphModel
 {
     protected $fillable = ['title', 'tags'];  // Auto-detected as flat
 }
 
 // ✅ Good: Complex structures as JSON
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $casts = [
         'preferences' => 'json',  // Nested associative array
@@ -757,7 +757,7 @@ class User extends Neo4JModel
 }
 
 // ❌ Bad: Related entities as JSON
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $casts = [
         'posts' => 'json',  // Should be relationship!
@@ -769,7 +769,7 @@ class User extends Neo4JModel
 
 ```php
 // Extract frequently queried nested values
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $casts = ['settings' => 'json'];
 
@@ -821,7 +821,7 @@ $user->config = [
 ```php
 use Illuminate\Validation\Rule;
 
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $casts = ['preferences' => 'json'];
 
@@ -858,7 +858,7 @@ class User extends Neo4JModel
  *   }
  * }
  */
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $casts = ['preferences' => 'json'];
 }
@@ -867,7 +867,7 @@ class User extends Neo4JModel
 ### 6. Use Accessors for Complex Logic
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $casts = ['preferences' => 'json'];
 
@@ -903,7 +903,7 @@ Convert between storage strategies as your application evolves.
 
 **Before**:
 ```php
-class Article extends Neo4JModel
+class Article extends GraphModel
 {
     // tags stored as native LIST: ['php', 'laravel']
 }
@@ -911,7 +911,7 @@ class Article extends Neo4JModel
 
 **After**:
 ```php
-class Article extends Neo4JModel
+class Article extends GraphModel
 {
     protected $casts = [
         'tags' => 'json',  // Now structured: {'primary': ['php'], 'secondary': ['laravel']}
@@ -946,7 +946,7 @@ $user->settings = [
 
 **After**:
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     public function favoritePosts()
     {
@@ -1007,7 +1007,7 @@ Complete examples demonstrating best practices.
 ### Example 1: User Settings
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $casts = [
         'preferences' => 'json',
@@ -1065,7 +1065,7 @@ $emailEnabled = User::whereJsonContains('preferences->notifications->email', tru
 ### Example 2: Product Metadata
 
 ```php
-class Product extends Neo4JModel
+class Product extends GraphModel
 {
     protected $casts = [
         'features' => 'json',
@@ -1128,7 +1128,7 @@ $touchscreenLaptops = Product::whereJsonContains('features', 'touchscreen')
 ### Example 3: Feature Flags
 
 ```php
-class Organization extends Neo4JModel
+class Organization extends GraphModel
 {
     protected $casts = [
         'feature_flags' => 'json',
@@ -1190,7 +1190,7 @@ docker exec neo4j-test cypher-shell -u neo4j -p password "CALL apoc.help('conver
 
 # Check config
 php artisan tinker
->>> DB::connection('neo4j')->hasApoc()
+>>> DB::connection('graph')->hasApoc()
 ```
 
 **If false**, install APOC (see [APOC Integration](#apoc-integration) section).
@@ -1215,7 +1215,7 @@ dd($user->getAttributes()['preferences']);  // Native type or JSON?
 protected $casts = ['preferences' => 'json'];
 
 // Option 2: Check APOC availability
-if (!DB::connection('neo4j')->hasApoc()) {
+if (!DB::connection('graph')->hasApoc()) {
     // Use simpler queries
     User::where('preferences', 'LIKE', '%"theme":"dark"%')->get();
 }

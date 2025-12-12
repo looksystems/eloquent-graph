@@ -76,11 +76,11 @@ User::where('status', 'premium')
 Add the `$labels` property to your model to specify additional labels beyond the primary table name:
 
 ```php
-use Look\EloquentCypher\Neo4JModel;
+use Look\EloquentCypher\GraphModel;
 
-class User extends Neo4JModel
+class User extends GraphModel
 {
-    protected $connection = 'neo4j';
+    protected $connection = 'graph';
     protected $table = 'users';
 
     // Additional labels (beyond 'users')
@@ -198,9 +198,9 @@ Model abstract entities that should never exist independently:
 
 ```php
 // Base class with shared labels
-abstract class Entity extends Neo4JModel
+abstract class Entity extends GraphModel
 {
-    protected $connection = 'neo4j';
+    protected $connection = 'graph';
     protected $labels = ['Entity'];
 }
 
@@ -234,9 +234,9 @@ class Organization extends Entity
 Model systems where entities can have multiple roles:
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
-    protected $connection = 'neo4j';
+    protected $connection = 'graph';
     protected $table = 'users';
     protected $labels = ['Person'];
 }
@@ -255,11 +255,11 @@ class Manager extends Employee
 **Query examples**:
 ```php
 // All people (users, employees, managers)
-$people = DB::connection('neo4j')
+$people = DB::connection('graph')
     ->select('MATCH (p:Person) RETURN p');
 
 // Only employees and managers
-$employees = DB::connection('neo4j')
+$employees = DB::connection('graph')
     ->select('MATCH (e:Employee) RETURN e');
 
 // Only managers
@@ -271,9 +271,9 @@ $managers = Manager::all();
 Model entity states that change over time:
 
 ```php
-class Product extends Neo4JModel
+class Product extends GraphModel
 {
-    protected $connection = 'neo4j';
+    protected $connection = 'graph';
     protected $table = 'products';
 
     // Default: new products are not featured
@@ -282,7 +282,7 @@ class Product extends Neo4JModel
     public function markAsFeatured()
     {
         // Add 'Featured' label in Neo4j
-        DB::connection('neo4j')->statement(
+        DB::connection('graph')->statement(
             'MATCH (p:Product {id: $id}) SET p:Featured',
             ['id' => $this->id]
         );
@@ -291,7 +291,7 @@ class Product extends Neo4JModel
     public function markAsDiscontinued()
     {
         // Replace 'Active' with 'Discontinued'
-        DB::connection('neo4j')->statement(
+        DB::connection('graph')->statement(
             'MATCH (p:Product {id: $id})
              REMOVE p:Active
              SET p:Discontinued',
@@ -308,22 +308,22 @@ class Product extends Neo4JModel
 Model cross-cutting concerns similar to PHP traits:
 
 ```php
-class AuditableUser extends Neo4JModel
+class AuditableUser extends GraphModel
 {
-    protected $connection = 'neo4j';
+    protected $connection = 'graph';
     protected $table = 'users';
     protected $labels = ['Person', 'Auditable'];
 }
 
-class CacheableProduct extends Neo4JModel
+class CacheableProduct extends GraphModel
 {
-    protected $connection = 'neo4j';
+    protected $connection = 'graph';
     protected $table = 'products';
     protected $labels = ['Product', 'Cacheable'];
 }
 
 // Query all auditable entities across types
-$auditables = DB::connection('neo4j')
+$auditables = DB::connection('graph')
     ->select('MATCH (n:Auditable) RETURN n, labels(n) as labels');
 ```
 
@@ -365,7 +365,7 @@ For models with multiple labels, create indexes on the primary label:
 
 ```php
 // Model with multiple labels
-class PremiumUser extends Neo4JModel
+class PremiumUser extends GraphModel
 {
     protected $table = 'users';
     protected $labels = ['Person', 'Premium'];
@@ -434,7 +434,7 @@ Neo4j maintains a separate index for nodes by label. When you query with labels,
 
 ```php
 // Without labels: Scans ALL nodes in database
-DB::connection('neo4j')->select('MATCH (n) WHERE n.email = $email RETURN n');
+DB::connection('graph')->select('MATCH (n) WHERE n.email = $email RETURN n');
 // Scans: 1,000,000 nodes
 
 // With single label: Scans only users
@@ -452,14 +452,14 @@ Put the most selective (specific) label first in your queries:
 
 ```php
 // Good: Specific label first
-DB::connection('neo4j')->select(
+DB::connection('graph')->select(
     'MATCH (u:Premium:User) WHERE u.email = $email RETURN u',
     ['email' => 'john@example.com']
 );
 // Neo4j checks :Premium first (5,000 nodes), then :User
 
 // Less optimal: Generic label first
-DB::connection('neo4j')->select(
+DB::connection('graph')->select(
     'MATCH (u:User:Premium) WHERE u.email = $email RETURN u',
     ['email' => 'john@example.com']
 );
@@ -474,11 +474,11 @@ Labels dramatically improve relationship traversal performance:
 
 ```php
 // Without labels: Traverses all relationships from all nodes
-DB::connection('neo4j')->select('MATCH (n)-[r:FOLLOWS]->(m) RETURN n, r, m');
+DB::connection('graph')->select('MATCH (n)-[r:FOLLOWS]->(m) RETURN n, r, m');
 // Scans: All nodes, all FOLLOWS relationships
 
 // With labels: Only traverses from User nodes
-DB::connection('neo4j')->select('MATCH (u:User)-[r:FOLLOWS]->(m:User) RETURN u, r, m');
+DB::connection('graph')->select('MATCH (u:User)-[r:FOLLOWS]->(m:User) RETURN u, r, m');
 // Scans: Only :User nodes, only FOLLOWS between users (10-100x faster)
 
 // With Eloquent Cypher relationships
@@ -492,13 +492,13 @@ Use `EXPLAIN` or `PROFILE` to see how Neo4j uses your labels:
 
 ```php
 // Check query plan
-$plan = DB::connection('neo4j')->select(
+$plan = DB::connection('graph')->select(
     'EXPLAIN MATCH (u:users:Premium) WHERE u.email = $email RETURN u',
     ['email' => 'test@example.com']
 );
 
 // Profile actual execution
-$stats = DB::connection('neo4j')->select(
+$stats = DB::connection('graph')->select(
     'PROFILE MATCH (u:users:Premium) WHERE u.email = $email RETURN u',
     ['email' => 'test@example.com']
 );
@@ -518,9 +518,9 @@ $stats = DB::connection('neo4j')->select(
 While `$labels` is static, you can create nodes with dynamic labels using raw Cypher:
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
-    protected $connection = 'neo4j';
+    protected $connection = 'graph';
     protected $table = 'users';
 
     public static function createWithRole(array $attributes, string $role)
@@ -529,7 +529,7 @@ class User extends Neo4JModel
         $user->save();
 
         // Add role label dynamically
-        DB::connection('neo4j')->statement(
+        DB::connection('graph')->statement(
             "MATCH (u:users {id: \$id}) SET u:$role",
             ['id' => $user->id]
         );
@@ -553,9 +553,9 @@ $moderator = User::createWithRole(['name' => 'Mod User'], 'Moderator');
 Apply labels conditionally during creation:
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
-    protected $connection = 'neo4j';
+    protected $connection = 'graph';
     protected $table = 'users';
 
     protected static function booted()
@@ -574,7 +574,7 @@ class User extends Neo4JModel
 
             if (!empty($labels)) {
                 $labelString = implode(':', $labels);
-                DB::connection('neo4j')->statement(
+                DB::connection('graph')->statement(
                     "MATCH (u:users {id: \$id}) SET u:$labelString",
                     ['id' => $user->id]
                 );
@@ -599,7 +599,7 @@ Use labels instead of type columns for polymorphic relationships:
 
 ```php
 // Instead of this (traditional polymorphism):
-class Comment extends Neo4JModel
+class Comment extends GraphModel
 {
     public function commentable()
     {
@@ -608,7 +608,7 @@ class Comment extends Neo4JModel
 }
 
 // Consider this (label-based):
-class Comment extends Neo4JModel
+class Comment extends GraphModel
 {
     public function post()
     {
@@ -624,7 +624,7 @@ class Comment extends Neo4JModel
 }
 
 // Query: "Which commentable entity is this?"
-DB::connection('neo4j')->select(
+DB::connection('graph')->select(
     'MATCH (c:comments {id: $id})-[:BELONGS_TO]->(target)
      RETURN c, target, labels(target) as target_type',
     ['id' => $comment->id]
@@ -642,9 +642,9 @@ DB::connection('neo4j')->select(
 Use labels for tenant isolation:
 
 ```php
-class TenantModel extends Neo4JModel
+class TenantModel extends GraphModel
 {
-    protected $connection = 'neo4j';
+    protected $connection = 'graph';
 
     protected static function booted()
     {
@@ -658,7 +658,7 @@ class TenantModel extends Neo4JModel
 
         static::created(function ($model) {
             // Add tenant label for fast filtering
-            DB::connection('neo4j')->statement(
+            DB::connection('graph')->statement(
                 'MATCH (n {id: $id}) SET n:Tenant' . $model->tenant_id,
                 ['id' => $model->id]
             );
@@ -677,7 +677,7 @@ class User extends TenantModel
 **Query by tenant**:
 ```php
 // Fast: Uses label index
-$tenantUsers = DB::connection('neo4j')->select(
+$tenantUsers = DB::connection('graph')->select(
     'MATCH (u:users:Tenant123) RETURN u'
 );
 
@@ -695,16 +695,16 @@ $tenantUsers = User::where('tenant_id', 123)->get();
 
 ```php
 // Before
-class User extends Neo4JModel
+class User extends GraphModel
 {
-    protected $connection = 'neo4j';
+    protected $connection = 'graph';
     protected $table = 'users';
 }
 
 // After
-class User extends Neo4JModel
+class User extends GraphModel
 {
-    protected $connection = 'neo4j';
+    protected $connection = 'graph';
     protected $table = 'users';
     protected $labels = ['Person']; // Added
 }
@@ -714,12 +714,12 @@ class User extends Neo4JModel
 
 ```php
 // In a migration or artisan command
-DB::connection('neo4j')->statement(
+DB::connection('graph')->statement(
     'MATCH (u:users) SET u:Person'
 );
 
 // Verify
-$count = DB::connection('neo4j')->select(
+$count = DB::connection('graph')->select(
     'MATCH (u:users:Person) RETURN count(u) as count'
 );
 ```
@@ -742,28 +742,28 @@ Refactor a single model into multiple label-based variants:
 
 ```php
 // Before: Single model with type property
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $table = 'users';
     protected $fillable = ['name', 'email', 'type']; // 'customer', 'employee', 'admin'
 }
 
 // After: Multiple models with labels
-class Customer extends Neo4JModel
+class Customer extends GraphModel
 {
     protected $table = 'users';
     protected $labels = ['Person', 'Customer'];
     protected $fillable = ['name', 'email'];
 }
 
-class Employee extends Neo4JModel
+class Employee extends GraphModel
 {
     protected $table = 'users';
     protected $labels = ['Person', 'Employee'];
     protected $fillable = ['name', 'email', 'department'];
 }
 
-class Admin extends Neo4JModel
+class Admin extends GraphModel
 {
     protected $table = 'users';
     protected $labels = ['Person', 'Employee', 'Admin'];
@@ -774,18 +774,18 @@ class Admin extends Neo4JModel
 **Migration**:
 ```php
 // Add labels based on type property
-DB::connection('neo4j')->statement(
+DB::connection('graph')->statement(
     "MATCH (u:users) WHERE u.type = 'customer' SET u:Person:Customer"
 );
-DB::connection('neo4j')->statement(
+DB::connection('graph')->statement(
     "MATCH (u:users) WHERE u.type = 'employee' SET u:Person:Employee"
 );
-DB::connection('neo4j')->statement(
+DB::connection('graph')->statement(
     "MATCH (u:users) WHERE u.type = 'admin' SET u:Person:Employee:Admin"
 );
 
 // Remove type property (optional)
-DB::connection('neo4j')->statement(
+DB::connection('graph')->statement(
     "MATCH (u:users) REMOVE u.type"
 );
 ```
@@ -796,17 +796,17 @@ If you need to remove labels:
 
 ```php
 // Remove specific label from all nodes
-DB::connection('neo4j')->statement(
+DB::connection('graph')->statement(
     'MATCH (u:users:Person) REMOVE u:Person'
 );
 
 // Remove multiple labels
-DB::connection('neo4j')->statement(
+DB::connection('graph')->statement(
     'MATCH (u:users:Person:Premium) REMOVE u:Person:Premium'
 );
 
 // Verify removal
-$count = DB::connection('neo4j')->select(
+$count = DB::connection('graph')->select(
     'MATCH (u:users) WHERE NOT u:Person RETURN count(u) as count'
 );
 ```
@@ -820,9 +820,9 @@ $count = DB::connection('neo4j')->select(
 Model products with multiple categorization and status labels:
 
 ```php
-class Product extends Neo4JModel
+class Product extends GraphModel
 {
-    protected $connection = 'neo4j';
+    protected $connection = 'graph';
     protected $table = 'products';
     protected $labels = ['Product', 'Active'];
 
@@ -860,7 +860,7 @@ DigitalProduct::where('price', '>', 0)->get();
 // MATCH (p:products:Active:Digital) WHERE p.price > 0
 
 // Products by multiple labels (featured AND digital)
-DB::connection('neo4j')->select(
+DB::connection('graph')->select(
     'MATCH (p:Product:Featured:Digital) RETURN p'
 );
 ```
@@ -879,9 +879,9 @@ Neo4jSchema::label('products', function ($label) {
 Model users with verification and subscription status:
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
-    protected $connection = 'neo4j';
+    protected $connection = 'graph';
     protected $table = 'users';
     protected $labels = ['Person'];
 
@@ -908,13 +908,13 @@ class VerifiedPremiumUser extends User
 ```php
 // Promote user to verified
 $user = User::find(1);
-DB::connection('neo4j')->statement(
+DB::connection('graph')->statement(
     'MATCH (u:users {id: $id}) SET u:Verified',
     ['id' => $user->id]
 );
 
 // Promote to premium
-DB::connection('neo4j')->statement(
+DB::connection('graph')->statement(
     'MATCH (u:users {id: $id}) SET u:Premium',
     ['id' => $user->id]
 );
@@ -923,18 +923,18 @@ DB::connection('neo4j')->statement(
 **Query patterns**:
 ```php
 // Find all verified users
-$verified = DB::connection('neo4j')->select(
+$verified = DB::connection('graph')->select(
     'MATCH (u:users:Verified) RETURN u'
 );
 
 // Find premium users who follow verified users
-$results = DB::connection('neo4j')->select(
+$results = DB::connection('graph')->select(
     'MATCH (p:users:Premium)-[:FOLLOWS]->(v:users:Verified)
      RETURN p.name as premium_user, v.name as verified_user'
 );
 
 // Count users by status combination
-$stats = DB::connection('neo4j')->select(
+$stats = DB::connection('graph')->select(
     'MATCH (u:users)
      RETURN
        count(CASE WHEN u:Verified THEN 1 END) as verified,
@@ -949,9 +949,9 @@ $stats = DB::connection('neo4j')->select(
 Model content with publication state and type labels:
 
 ```php
-class Content extends Neo4JModel
+class Content extends GraphModel
 {
-    protected $connection = 'neo4j';
+    protected $connection = 'graph';
     protected $table = 'content';
     protected $labels = ['Content', 'Draft'];
 
@@ -959,7 +959,7 @@ class Content extends Neo4JModel
 
     public function publish()
     {
-        DB::connection('neo4j')->statement(
+        DB::connection('graph')->statement(
             'MATCH (c:content {id: $id})
              REMOVE c:Draft
              SET c:Published, c.published_at = datetime()',
@@ -969,7 +969,7 @@ class Content extends Neo4JModel
 
     public function unpublish()
     {
-        DB::connection('neo4j')->statement(
+        DB::connection('graph')->statement(
             'MATCH (c:content {id: $id})
              REMOVE c:Published
              SET c:Draft',
@@ -992,12 +992,12 @@ class Video extends Content
 **Query published content**:
 ```php
 // All published content (any type)
-$published = DB::connection('neo4j')->select(
+$published = DB::connection('graph')->select(
     'MATCH (c:Content:Published) RETURN c, labels(c) as type'
 );
 
 // Only published articles
-$articles = DB::connection('neo4j')->select(
+$articles = DB::connection('graph')->select(
     'MATCH (a:Article:Published)
      RETURN a
      ORDER BY a.published_at DESC
@@ -1005,7 +1005,7 @@ $articles = DB::connection('neo4j')->select(
 );
 
 // Draft videos
-$draftVideos = DB::connection('neo4j')->select(
+$draftVideos = DB::connection('graph')->select(
     'MATCH (v:Video:Draft) RETURN v'
 );
 ```
@@ -1025,14 +1025,14 @@ Real-world performance comparisons between single-label and multi-label query pa
 // - 5% Premium + Verified (5,000 nodes)
 
 // Single-label approach (property-based)
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $table = 'users';
     protected $fillable = ['name', 'email', 'is_premium', 'is_verified'];
 }
 
 // Multi-label approach
-class PremiumUser extends Neo4JModel
+class PremiumUser extends GraphModel
 {
     protected $table = 'users';
     protected $labels = ['Person', 'Premium'];
@@ -1062,7 +1062,7 @@ $duration = (microtime(true) - $start) * 1000;
 
 // Multi-label: Label-based filtering (FAST)
 $start = microtime(true);
-$users = DB::connection('neo4j')->select(
+$users = DB::connection('graph')->select(
     'MATCH (u:users:Premium:Verified) RETURN u'
 );
 $duration = (microtime(true) - $start) * 1000;
@@ -1096,7 +1096,7 @@ $users = User::where('is_premium', true)->get();
 // Memory: 45 MB (100,000 nodes loaded)
 
 // Label-based: Loads only matching nodes
-$users = DB::connection('neo4j')->select(
+$users = DB::connection('graph')->select(
     'MATCH (u:users:Premium) RETURN u'
 );
 // Memory: 4.5 MB (10,000 nodes loaded)
@@ -1125,15 +1125,15 @@ Label operations have minimal overhead:
 **Solution**:
 ```php
 // 1. Verify model configuration
-class User extends Neo4JModel
+class User extends GraphModel
 {
-    protected $connection = 'neo4j'; // Must be set
+    protected $connection = 'graph'; // Must be set
     protected $table = 'users';
     protected $labels = ['Person']; // Check array syntax
 }
 
 // 2. Check node in Neo4j directly
-$result = DB::connection('neo4j')->select(
+$result = DB::connection('graph')->select(
     'MATCH (u {id: $id}) RETURN labels(u) as labels',
     ['id' => $user->id]
 );
@@ -1160,7 +1160,7 @@ PremiumUser::all();
 // Query: MATCH (u:users:Premium) (fast)
 
 // Verify query plan
-$plan = DB::connection('neo4j')->select(
+$plan = DB::connection('graph')->select(
     'EXPLAIN MATCH (u:users:Premium) RETURN u'
 );
 // Look for "NodeByLabelScan" - indicates label usage
@@ -1175,14 +1175,14 @@ $plan = DB::connection('neo4j')->select(
 **Solution**:
 ```php
 // Bad: Overwrites all properties AND labels
-DB::connection('neo4j')->statement(
+DB::connection('graph')->statement(
     'MATCH (u:users {id: $id}) SET u = $props',
     ['id' => 1, 'props' => ['name' => 'New Name']]
 );
 // Result: Node loses all labels except :users
 
 // Good: Use += to merge properties
-DB::connection('neo4j')->statement(
+DB::connection('graph')->statement(
     'MATCH (u:users {id: $id}) SET u += $props',
     ['id' => 1, 'props' => ['name' => 'New Name']]
 );
@@ -1200,11 +1200,11 @@ $user->update(['name' => 'New Name']);
 **Diagnosis**:
 ```php
 // Check if index exists
-$indexes = DB::connection('neo4j')->select('SHOW INDEXES');
+$indexes = DB::connection('graph')->select('SHOW INDEXES');
 dump($indexes);
 
 // Profile query to see index usage
-$profile = DB::connection('neo4j')->select(
+$profile = DB::connection('graph')->select(
     'PROFILE MATCH (u:users:Premium) WHERE u.email = $email RETURN u',
     ['email' => 'test@example.com']
 );
@@ -1219,7 +1219,7 @@ Neo4jSchema::label('users', function ($label) {
 // Index applies to all (:users) nodes, including (:users:Premium)
 
 // Verify index is used
-$plan = DB::connection('neo4j')->select(
+$plan = DB::connection('graph')->select(
     'EXPLAIN MATCH (u:users:Premium) WHERE u.email = $email RETURN u',
     ['email' => 'test@example.com']
 );
@@ -1242,13 +1242,13 @@ $model = new User;
 dump($model->getLabels());
 
 // Check actual labels in database
-$result = DB::connection('neo4j')->select(
+$result = DB::connection('graph')->select(
     'MATCH (u:users) RETURN DISTINCT labels(u) as label_combinations LIMIT 10'
 );
 dump($result);
 
 // Find nodes with unexpected labels
-$unexpected = DB::connection('neo4j')->select(
+$unexpected = DB::connection('graph')->select(
     'MATCH (u:users) WHERE u:UnexpectedLabel RETURN u'
 );
 ```

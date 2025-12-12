@@ -485,7 +485,7 @@ Define reusable query constraints in your model:
 
 ```php
 // In your model
-class User extends Neo4JModel
+class User extends GraphModel
 {
     public function scopeActive($query)
     {
@@ -527,7 +527,7 @@ class ActiveScope implements \Illuminate\Database\Eloquent\Scope
 }
 
 // Apply to model
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected static function booted()
     {

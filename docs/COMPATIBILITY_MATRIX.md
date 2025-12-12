@@ -115,7 +115,7 @@ This document provides a comprehensive compatibility matrix comparing Laravel's 
 
 | Component | Laravel Class | Neo4j Class | Status | Test Coverage |
 |-----------|--------------|-------------|---------|--------------|
-| **Model** | Illuminate\Database\Eloquent\Model | Neo4JModel | ✅ Extended | 🧪 Neo4JModelTest, ModelOperationsTest |
+| **Model** | Illuminate\Database\Eloquent\Model | GraphModel | ✅ Extended | 🧪 GraphModelTest, ModelOperationsTest |
 | save() | ✅ | 🔗 Inherited | ✅ | 🧪 CreateTest, UpdateTest, ModelEventsTest |
 | create() | ✅ | 🔗 Inherited | ✅ | 🧪 CreateTest, ModelCreationAdvancedTest |
 | update() | ✅ | 🔗 Inherited | ✅ | 🧪 UpdateTest |
@@ -137,7 +137,7 @@ This document provides a comprehensive compatibility matrix comparing Laravel's 
 | loadAggregate() | ✅ | 🔗 Inherited | ✅ | 🧪 LoadAggregateTest |
 | getAttribute() | ✅ | ✅ Override | ✅ | 🧪 MutatorsAccessorsTest |
 | setAttribute() | ✅ | ✅ Override | ✅ | 🧪 MutatorsAccessorsTest |
-| getTable() | ✅ | ✅ Override | ✅ | 🧪 Neo4JModelTest |
+| getTable() | ✅ | ✅ Override | ✅ | 🧪 GraphModelTest |
 | timestamps | ✅ | ✅ Override | ✅ | 🧪 TimestampsAndCastingTest |
 | **Multi-Label Support** | | | | |
 | getLabels() | - | ✅ Neo4j Native | ✅ | 🧪 MultiLabelNodesTest |
@@ -253,7 +253,7 @@ This document provides a comprehensive compatibility matrix comparing Laravel's 
 | updated | ✅ | ✅ | ✅ | 🧪 EventsAndObserversTest, ModelEventsTest |
 | deleting | ✅ | ✅ | ✅ | 🧪 EventsAndObserversTest, ModelEventsTest |
 | deleted | ✅ | ✅ | ✅ | 🧪 EventsAndObserversTest, ModelEventsTest |
-| **Soft Deletes** | SoftDeletes trait | Neo4jSoftDeletes trait | ✅ Custom | 🧪 SoftDeletesTest, SoftDeletesAdvancedTest |
+| **Soft Deletes** | SoftDeletes trait | GraphSoftDeletes trait | ✅ Custom | 🧪 SoftDeletesTest, SoftDeletesAdvancedTest |
 | **Global Scopes** | ✅ | ✅ Full Support | ✅ | 🧪 ModelScopesTest |
 | **Local Scopes** | ✅ | ✅ Full Support | ✅ | 🧪 ModelScopesTest |
 | **Mutators/Accessors** | ✅ | ✅ Full Support | ✅ | 🧪 MutatorsAccessorsTest |
@@ -316,7 +316,7 @@ This document provides a comprehensive compatibility matrix comparing Laravel's 
 
 | Feature | Laravel Config | Neo4j Config | Notes |
 |---------|---------------|--------------|-------|
-| **Connection** | database.connections | database.connections.neo4j | Custom driver |
+| **Connection** | database.connections | database.connections.graph | Custom driver |
 | **Host** | DB_HOST | NEO4J_HOST | Default: localhost |
 | **Port** | DB_PORT | NEO4J_PORT | Default: 7687 |
 | **Database** | DB_DATABASE | NEO4J_DATABASE | Default: neo4j |

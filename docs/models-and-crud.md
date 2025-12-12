@@ -35,12 +35,12 @@ class User extends Model
 }
 
 // ELOQUENT CYPHER
-use Look\EloquentCypher\Neo4JModel;
+use Look\EloquentCypher\GraphModel;
 
-class User extends Neo4JModel
+class User extends GraphModel
 {
-    // 1. Set connection to 'neo4j'
-    protected $connection = 'neo4j';
+    // 1. Set connection to 'graph'
+    protected $connection = 'graph';
 
     // 2. Disable auto-incrementing (Neo4j uses unique IDs)
     public $incrementing = false;
@@ -61,14 +61,14 @@ class User extends Neo4JModel
 
 ```php
 // Default: pluralized lowercase class name
-class User extends Neo4JModel {}
+class User extends GraphModel {}
 // Table/Label: "users"
 
-class BlogPost extends Neo4JModel {}
+class BlogPost extends GraphModel {}
 // Table/Label: "blog_posts"
 
 // Custom table name
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $table = 'app_users';
 }
@@ -81,7 +81,7 @@ class User extends Neo4JModel
 **⚠️ Different from Eloquent**: Neo4j doesn't have auto-incrementing IDs.
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     // Always set these
     public $incrementing = false;
@@ -107,11 +107,11 @@ $user->save();
 
 namespace App\Models;
 
-use Look\EloquentCypher\Neo4JModel;
+use Look\EloquentCypher\GraphModel;
 
-class User extends Neo4JModel
+class User extends GraphModel
 {
-    protected $connection = 'neo4j';
+    protected $connection = 'graph';
     public $incrementing = false;
     protected $keyType = 'int';
 
@@ -293,7 +293,7 @@ expect($user->exists)->toBeFalse();
 **✅ Same as Eloquent**: Timestamps work automatically and identically.
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     // Timestamps enabled by default
     public $timestamps = true;
@@ -319,7 +319,7 @@ $user->touch(); // Updates updated_at to now
 ### Disable Timestamps
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     public $timestamps = false; // No automatic timestamps
 }
@@ -328,7 +328,7 @@ class User extends Neo4JModel
 ### Custom Timestamp Columns
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     const CREATED_AT = 'creation_date';
     const UPDATED_AT = 'last_modified';
@@ -358,7 +358,7 @@ $recentUsers = User::where('created_at', '>', now()->subDays(7))->get();
 ### Supported Cast Types
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $casts = [
         // Primitives
@@ -479,7 +479,7 @@ This is automatic and transparent - you don't need to think about it.
 ### Set Mutators (Transform on Write)
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $fillable = ['name', 'email'];
 
@@ -503,7 +503,7 @@ echo $user->email; // "john@example.com"
 ### Get Mutators (Transform on Read)
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $fillable = ['price', 'first_name', 'last_name'];
 
@@ -532,7 +532,7 @@ echo $user->full_name;  // "John Doe" (computed)
 ```php
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $fillable = ['name', 'email'];
 
@@ -568,7 +568,7 @@ class User extends Neo4JModel
 Casts run before mutators, so you can combine them:
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $casts = [
         'settings' => 'array',
@@ -598,7 +598,7 @@ class User extends Neo4JModel
 ### Using $fillable (Whitelist)
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     // Only these attributes can be mass-assigned
     protected $fillable = ['name', 'email', 'age'];
@@ -619,7 +619,7 @@ $user->save();
 ### Using $guarded (Blacklist)
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     // All attributes fillable except these
     protected $guarded = ['id', 'role'];
@@ -636,7 +636,7 @@ echo $user->role; // null
 ### Allow All (⚠️ Use with Caution)
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     protected $guarded = []; // Allow all attributes
 }
@@ -658,20 +658,20 @@ $user->forceFill([
 
 **✅ Same as Eloquent**: Soft deletes work almost identically.
 
-**⚠️ Different from Eloquent**: Use `Neo4jSoftDeletes` trait alongside Laravel's `SoftDeletes` trait.
+**⚠️ Different from Eloquent**: Use `GraphSoftDeletes` trait alongside Laravel's `SoftDeletes` trait.
 
 ### Setup
 
 ```php
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Look\EloquentCypher\Concerns\Neo4jSoftDeletes;
-use Look\EloquentCypher\Neo4JModel;
+use Look\EloquentCypher\Concerns\GraphSoftDeletes;
+use Look\EloquentCypher\GraphModel;
 
-class User extends Neo4JModel
+class User extends GraphModel
 {
-    use SoftDeletes, Neo4jSoftDeletes;
+    use SoftDeletes, GraphSoftDeletes;
 
-    protected $connection = 'neo4j';
+    protected $connection = 'graph';
     public $incrementing = false;
     protected $keyType = 'int';
 
@@ -682,7 +682,7 @@ class User extends Neo4JModel
 }
 ```
 
-**Why two traits?** Laravel's `SoftDeletes` provides scopes and helper methods. `Neo4jSoftDeletes` handles Neo4j-specific deletion logic. They work together seamlessly.
+**Why two traits?** Laravel's `SoftDeletes` provides scopes and helper methods. `GraphSoftDeletes` handles Neo4j-specific deletion logic. They work together seamlessly.
 
 ### Soft Delete Operations
 
@@ -833,10 +833,10 @@ Now that you understand models and CRUD operations, explore these related topics
 ### Essential Model Properties
 
 ```php
-class User extends Neo4JModel
+class User extends GraphModel
 {
     // Required
-    protected $connection = 'neo4j';
+    protected $connection = 'graph';
     public $incrementing = false;
     protected $keyType = 'int';
 
