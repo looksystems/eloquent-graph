@@ -15,8 +15,6 @@ Switch your Laravel application from MySQL/PostgreSQL to graph databases with ze
 
 ## Table of Contents
 
-- [Multi-Database Support](#multi-database-support)
-- [Status](#status)
 - [Installation](#installation)
 - [Docker Setup](#docker-setup-recommended)
 - [Configuration](#configuration)
@@ -31,19 +29,6 @@ Switch your Laravel application from MySQL/PostgreSQL to graph databases with ze
 - [License](#license)
 
 ---
-
-## Multi-Database Support
-
-- **Neo4j** - Full support (Community & Enterprise editions)
-- **Memgraph** - Planned (no ETA)
-- **Apache AGE** - Planned (no ETA)
-- **Custom Drivers** - Extensible driver architecture
-
-## Status
-
-**Production Ready** - 1,520 passing tests, 24,000+ assertions, near-complete Eloquent compatibility.
-
-See [Features](#features) for capabilities and [Limitations](#known-limitations) for platform differences.
 
 ## Installation
 
@@ -361,13 +346,13 @@ DriverManager::register('memgraph', MemgraphDriver::class);
 
 **Built-in Drivers:**
 - **Neo4j** - Full support
-- **Memgraph** - Planned (no ETA)
-- **Apache AGE** - Planned (no ETA)
 
 **Custom Driver Requirements:**
 - Implement `GraphDriverInterface`
 - Provide `ResultSetInterface`, `TransactionInterface`, `CapabilitiesInterface`, `SchemaIntrospectorInterface`
 - Register with `DriverManager::register()`
+
+Support for other graph databases to follow eg. Memgraph, Kuzu, FalkorDB.
 
 ## Features
 
