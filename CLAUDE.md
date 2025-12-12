@@ -137,7 +137,7 @@ Driver abstraction layer allows pluggable graph database support through `GraphD
   - Uses `GraphDriverInterface` for database operations
 - `GraphQueryBuilder` extends `Illuminate\Database\Query\Builder`
 - `GraphEloquentBuilder` extends `Illuminate\Database\Eloquent\Builder`
-- `GraphEdgePivot` extends `Illuminate\Database\Eloquent\Relations\Pivot`
+- `EdgePivot` extends `Illuminate\Database\Eloquent\Relations\Pivot`
 
 **Driver Abstraction Layer:**
 - `GraphDriverInterface` - Core driver contract
@@ -278,7 +278,7 @@ config('database.connections.graph.retry', [
 **Driver Abstraction:**
 - `src/Contracts/` - All driver interface definitions (GraphDriverInterface, ResultSetInterface, etc.)
 - `src/Drivers/DriverManager.php` - Driver factory and registry
-- `src/Drivers/Neo4j/` - Neo4j driver implementation (8 classes)
+- `src/Drivers/Neo4j/` - Neo4j driver implementation (6 classes)
 - `src/GraphConnection.php` - Database connection using GraphDriverInterface
 - `src/GraphModel.php` - Core model
 - `src/GraphQueryBuilder.php` - SQL to Cypher translation
@@ -286,10 +286,10 @@ config('database.connections.graph.retry', [
 
 **Core Features:**
 - `src/Relations/` - All relationship implementations
-- `src/Traits/Neo4jNativeRelationships.php` - Native edge support trait
+- `src/Traits/NativeRelationships.php` - Native edge support trait
 - `src/Traits/SupportsNativeEdges.php` - Edge configuration trait
-- `src/Services/Neo4jEdgeManager.php` - Edge CRUD operations
-- `src/GraphEdgePivot.php` - Virtual pivot for edge properties
+- `src/Services/EdgeManager.php` - Edge CRUD operations
+- `src/EdgePivot.php` - Virtual pivot for edge properties
 
 **Schema & Introspection:**
 - `src/Schema/GraphSchemaBuilder.php` - Schema management using SchemaIntrospectorInterface
@@ -299,26 +299,26 @@ config('database.connections.graph.retry', [
 
 ## Test Coverage
 - Tests use port 7688 for Neo4j to avoid conflicts
-- **Total tests**: 1,513 tests
-- **Passing**: 1,485 tests (98.1% pass rate, 28 intentionally skipped)
+- **Total tests**: ~1,520 tests
+- **Passing**: ~1,492 tests (28 intentionally skipped)
 - **Assertions**: 24,000+ assertions across all tests
-- **Total test files**: ~105 files covering all package functionality
+- **Total test files**: 152 files covering all package functionality
 - **Current grade**: A+ (Excellent, comprehensive, maintainable)
-- **See detailed analysis**: [TEST_SUITE_REVIEW.md](TEST_SUITE_REVIEW.md)
-- **See improvement plan**: [TEST_IMPROVEMENT_ROADMAP.md](TEST_IMPROVEMENT_ROADMAP.md)
+- **See detailed analysis**: [TEST_SUITE_REVIEW.md](specs/TEST_SUITE_REVIEW.md)
+- **See improvement plan**: [TEST_IMPROVEMENT_ROADMAP.md](specs/TEST_IMPROVEMENT_ROADMAP.md)
 
 ### Test Suite Documentation
 
 For comprehensive information about the test suite:
 
-**[TEST_SUITE_REVIEW.md](TEST_SUITE_REVIEW.md)** - Complete systematic review
+**[TEST_SUITE_REVIEW.md](specs/TEST_SUITE_REVIEW.md)** - Complete systematic review
 - Detailed analysis of all 7 test categories
 - Strengths and weaknesses by category
 - Exemplary test files to use as templates
 - Test quality patterns and anti-patterns
 - Critical issues and recommendations
 
-**[TEST_IMPROVEMENT_ROADMAP.md](TEST_IMPROVEMENT_ROADMAP.md)** - Implementation plan
+**[TEST_IMPROVEMENT_ROADMAP.md](specs/TEST_IMPROVEMENT_ROADMAP.md)** - Implementation plan
 - Critical fixes - soft deletes, exceptions, CRUD expansion
 - Important improvements - relationships, unit tests
 - Enhancements - file splits, negative tests, polish
@@ -330,7 +330,7 @@ For comprehensive information about the test suite:
   - All JSON tests passing with or without APOC!
 - **Neo4j Edition**: Fully compatible with Neo4j Community Edition (no Enterprise features required)
 - **Nested JSON Path Updates**: Partial implementation exists but not fully functional
-  - Foundation in `Neo4JModel::setJsonPathAttribute()` (src/Neo4JModel.php:1144-1177)
+  - Foundation in `GraphModel::setJsonPathAttribute()` (src/GraphModel.php)
   - Workaround: Update entire parent property instead of nested path
   - Example: `$user->update(['settings' => $modifiedSettings])` instead of `$user->update(['settings->key' => value])`
 - **Performance Tests**: Environment-dependent timing tests are skipped
@@ -453,7 +453,7 @@ For comprehensive information about the test suite:
   - **Macro Support**: Extensible with custom reusable patterns ✅
   - **Full Backward Compatibility**: Existing `cypher(string)` usage unchanged ✅
   - 87 comprehensive tests covering all functionality (100% passing) ✅
-  - See detailed guide: [DSL_USAGE_GUIDE.md](DSL_USAGE_GUIDE.md)
+  - See detailed guide: [DSL_USAGE_GUIDE.md](specs/DSL_USAGE_GUIDE.md)
 
 ## Important Notes
 - Follow TDD - write tests first

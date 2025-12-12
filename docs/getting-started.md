@@ -1,13 +1,59 @@
 # Getting Started with Eloquent Cypher
 
-Welcome to Eloquent Cypher! This guide will get you up and running with Neo4j in your Laravel application in under 10 minutes.
+Welcome to Eloquent Cypher! This guide will get you up and running with Neo4j in your Laravel application.
 
-**What You'll Learn:**
-- Installing the package
-- Setting up Neo4j with Docker
-- Configuring your Laravel app
-- Creating your first model
-- Running basic queries
+---
+
+## Quick Start (5 minutes)
+
+Already familiar with Neo4j and Laravel? Here's the condensed version:
+
+```bash
+# 1. Install
+composer require looksystems/eloquent-cypher
+
+# 2. Start Neo4j
+docker run -d --name neo4j-test -p 7688:7687 -p 7475:7474 \
+  -e NEO4J_AUTH=neo4j/password neo4j:5-community
+```
+
+```env
+# 3. Add to .env
+GRAPH_DATABASE_TYPE=neo4j
+GRAPH_HOST=localhost
+GRAPH_PORT=7688
+GRAPH_USERNAME=neo4j
+GRAPH_PASSWORD=password
+GRAPH_DATABASE=neo4j
+```
+
+```php
+// 4. Add to config/database.php connections array
+'graph' => [
+    'driver' => 'graph',
+    'database_type' => env('GRAPH_DATABASE_TYPE', 'neo4j'),
+    'host' => env('GRAPH_HOST', 'localhost'),
+    'port' => env('GRAPH_PORT', 7688),
+    'database' => env('GRAPH_DATABASE', 'neo4j'),
+    'username' => env('GRAPH_USERNAME', 'neo4j'),
+    'password' => env('GRAPH_PASSWORD', 'password'),
+    'batch_size' => 100,
+    'enable_batch_execution' => true,
+],
+
+// 5. Create a model
+class User extends \Look\EloquentCypher\GraphModel
+{
+    protected $connection = 'graph';
+    protected $fillable = ['name', 'email'];
+}
+
+// 6. Use it like Eloquent
+User::create(['name' => 'John', 'email' => 'john@example.com']);
+User::where('name', 'John')->first();
+```
+
+Need more details? Continue reading below.
 
 ---
 
@@ -571,6 +617,33 @@ You're now ready to build with Eloquent Cypher! Here's what to explore next:
 **Reference:**
 - [Quick Reference](quick-reference.md) - Cheat sheets and tables
 - [Troubleshooting](troubleshooting.md) - Common issues and solutions
+
+---
+
+## Testing
+
+To run the package test suite:
+
+```bash
+# Run all tests (sequentially)
+./vendor/bin/pest
+
+# Run with coverage report
+./vendor/bin/pest --coverage-text
+
+# Run specific test
+./vendor/bin/pest tests/Feature/BasicCrudTest.php
+```
+
+**Note:** Tests use port 7688 by default.
+
+---
+
+## Need Help?
+
+1. Check the test suite for usage examples
+2. Read the comprehensive documentation
+3. Open an issue on GitHub
 
 ---
 

@@ -5,7 +5,7 @@
 
 [![Latest Version](https://img.shields.io/packagist/v/looksystems/eloquent-cypher.svg)](https://packagist.org/packages/looksystems/eloquent-cypher)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-1513%20passing%20%2B%2028%20skipped-brightgreen.svg)](#testing)
+[![Tests](https://img.shields.io/badge/tests-1520%20total%20(28%20skipped)-brightgreen.svg)](#testing)
 [![Laravel 10.x-12.x](https://img.shields.io/badge/Laravel-10.x--12.x-FF2D20.svg)](https://laravel.com)
 [![PHP 8.0+](https://img.shields.io/badge/PHP-8.0%2B-777BB4.svg)](https://php.net)
 
@@ -13,18 +13,37 @@
 
 Switch your Laravel application from MySQL/PostgreSQL to graph databases with zero code changes. Keep using the Eloquent API you know and love while gaining the power of graph databases.
 
-## 🎯 Multi-Database Support
+## Table of Contents
+
+- [Multi-Database Support](#multi-database-support)
+- [Status](#status)
+- [Installation](#installation)
+- [Docker Setup](#docker-setup-recommended)
+- [Configuration](#configuration)
+- [Quick Start](#quick-start)
+- [Usage Examples](#usage-examples)
+- [Features](#features)
+- [Requirements](#requirements)
+- [Documentation](#documentation)
+- [Known Limitations](#known-limitations)
+- [Testing](#testing)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## Multi-Database Support
 
 - **Neo4j** - Full support (Community & Enterprise editions)
-- **Memgraph** - Coming soon
-- **Apache AGE** - Coming soon
+- **Memgraph** - Planned (no ETA)
+- **Apache AGE** - Planned (no ETA)
 - **Custom Drivers** - Extensible driver architecture
 
-## 🚀 Status
+## Status
 
-- **1,513 tests** - 100% functional compatibility
-- **24,000+ assertions** - Comprehensive test coverage
-- **100% Eloquent compatibility** - ALL Eloquent features work perfectly
+- **1,520 tests** - Comprehensive functional coverage
+- **24,000+ assertions** - Thorough test coverage
+- **Near-complete Eloquent compatibility** - Most Eloquent features work identically (see [Limitations](#known-limitations))
 - **Driver Abstraction** - Pluggable driver architecture for multiple graph databases
 - **Multi-label nodes** - Assign multiple labels to nodes (e.g., `:users:Person:Individual`)
 - **70% faster bulk operations** - Batch execution matches MySQL/Postgres performance
@@ -36,7 +55,7 @@ Switch your Laravel application from MySQL/PostgreSQL to graph databases with ze
 - **Graph database superpowers** - Full graph capabilities alongside Eloquent
 - **Feature complete** - select, addSelect, cursor, whereHas, doesntHave, chunk, lazy, increment, etc.
 
-## 📦 Installation
+## Installation
 
 ```bash
 composer require looksystems/eloquent-cypher
@@ -50,7 +69,7 @@ Register the service provider in `config/app.php`:
 ],
 ```
 
-## 🐳 Docker Setup (Recommended)
+## Docker Setup (Recommended)
 
 ```bash
 # Using Docker Compose
@@ -67,7 +86,7 @@ docker run -d \
 
 Note: Default test port is 7688. You can customize ports if needed.
 
-## ⚙️ Configuration
+## Configuration
 
 Add your graph database connection to `config/database.php`:
 
@@ -124,7 +143,7 @@ GRAPH_RELATIONSHIP_STORAGE=hybrid
 
 > **See also:** [Configuration Guide](specs/CONFIGURATION.md) for comprehensive configuration guide
 
-## 🏃 Quick Start
+## Quick Start
 
 Change your model's base class from `Model` to `GraphModel`:
 
@@ -145,7 +164,7 @@ class User extends GraphModel
 
 That's it! All your existing Eloquent code continues to work.
 
-## 💻 Usage Examples
+## Usage Examples
 
 ### Standard Eloquent Operations
 
@@ -168,7 +187,7 @@ DB::transaction(function () {
 });
 ```
 
-### 🏷️ Multi-Label Nodes
+### Multi-Label Nodes
 
 Assign multiple labels to your graph nodes for better organization and query performance:
 
@@ -210,7 +229,7 @@ $users = User::with('posts')->whereHas('posts')->get();
 - **Laravel-Like**: Familiar API with `$labels` property
 - **Full Support**: Works with all Eloquent features (relationships, eager loading, scopes, etc.)
 
-### 🚀 Performance Features
+### Performance Features
 
 #### Batch Operations
 ```php
@@ -279,7 +298,7 @@ if (!DB::connection('graph')->ping()) {
 
 > **Note:** Exception classes are database-specific (e.g., `Neo4jTransientException` for Neo4j driver).
 
-### 🔥 Native Graph Relationships
+### Native Graph Relationships
 
 ```php
 use Look\EloquentCypher\GraphModel;
@@ -361,119 +380,20 @@ php artisan neo4j:schema:export schema.json
 php artisan neo4j:schema:export schema.yaml --format=yaml
 ```
 
-### Polymorphic Relationships & Architecture
+### Polymorphic Relationships
 
-**Design Decision**: Polymorphic relationships use foreign key storage, not native graph edges.
-
-#### Why Foreign Keys for Polymorphic Relations?
-
-Polymorphic relationships in Laravel require storing TWO pieces of information:
-1. The related model's ID (e.g., `commentable_id`)
-2. The related model's type (e.g., `commentable_type = 'App\Models\Post'`)
-
-**Technical Rationale**:
-
-**Option 1: Dynamic Edge Types** ❌
-```cypher
-# Would need different edge types per parent model
-MATCH (post)-[:COMMENTABLE_POST]->(comment)
-MATCH (video)-[:COMMENTABLE_VIDEO]->(comment)
-# Problem: Relationship definition is static in Laravel, can't determine type until runtime
-```
-
-**Option 2: Edge Properties** ❌
-```cypher
-# Store type as edge property
-MATCH (n)-[r:COMMENTABLE {type: 'Post'}]->(comment)
-# Problem: Neo4j Community Edition doesn't index edge properties
-# Result: ~7x slower than foreign key mode
-```
-
-**Option 3: Foreign Key Storage** ✅ CURRENT
-```cypher
-# Use node properties with compound index
-MATCH (post), (comment)
-WHERE comment.commentable_id = post.id
-  AND comment.commentable_type = 'App\\Models\\Post'
-# Benefits:
-# • Fast with compound index on (commentable_id, commentable_type)
-# • 100% Eloquent API compatibility
-# • All polymorphic methods work identically to MySQL/PostgreSQL
-```
-
-#### Performance Comparison
-
-Benchmark with 1,000 models and 10,000 polymorphic relations:
-
-| Mode | Query Time | Index Support | Eloquent Compatible |
-|------|-----------|---------------|---------------------|
-| **Foreign Key** (current) | ~2ms | ✅ Compound index | ✅ 100% |
-| Native Edge + Property | ~15ms | ❌ No edge indexes | ⚠️ Limited |
-| Dynamic Edge Types | N/A | ✅ Type index | ❌ Runtime issues |
-
-#### What Works
-
-All Eloquent polymorphic relationship methods work perfectly:
+All Eloquent polymorphic relationship methods work fully:
 
 ```php
-// Polymorphic One-to-Many
+// morphOne, morphMany, morphTo, morphToMany all work
 $post->comments()->create(['body' => 'Great post!']);
-$video->comments()->create(['body' => 'Nice video!']);
-
-// Polymorphic Many-to-Many
 $post->tags()->attach([1, 2, 3]);
-$video->tags()->sync([2, 3, 4]);
-
-// Polymorphic One-to-One
-$user->image()->create(['url' => 'avatar.jpg']);
-
-// Inverse Polymorphic
 $comment->commentable; // Returns Post or Video
 ```
 
-#### Graph Traversal Workaround
+**Note:** Polymorphic relationships use foreign key storage (not native graph edges) for performance and full Eloquent compatibility. See [Relationships docs](docs/relationships.md) for details.
 
-For graph visualization or edge-only queries, use foreign key matching:
-
-```php
-// Eloquent way (recommended):
-$post->comments; // Works perfectly with foreign keys
-
-// Raw Cypher for graph traversal:
-$connection = DB::connection('neo4j');
-$results = $connection->select("
-    MATCH (post:posts {id: \$postId}), (comment:comments)
-    WHERE comment.commentable_id = post.id
-      AND comment.commentable_type = \$modelClass
-    RETURN comment
-", [
-    'postId' => $post->id,
-    'modelClass' => get_class($post)
-]);
-```
-
-#### When to Use
-
-✅ **Use polymorphic relations** when:
-- You need 100% Eloquent API compatibility
-- Performance is important (foreign keys are faster)
-- You're migrating from MySQL/PostgreSQL
-
-⚠️ **Consider alternatives** when:
-- You need pure graph traversal (no foreign key queries)
-- You only use Neo4j (not migrating from SQL)
-- You can accept limited Eloquent method support
-
-#### Future Considerations
-
-If you need native edges for polymorphic relationships:
-1. Open an issue describing your use case
-2. We'll consider adding a feature flag for experimental edge mode
-3. Default will remain foreign key mode for compatibility
-
-For more details, see the architectural decision in `SKIPPED_TESTS_ANALYSIS.md`.
-
-### 🔥 Cypher DSL Query Builder
+### Cypher DSL Query Builder
 
 Build complex Cypher queries using a fluent, type-safe API:
 
@@ -528,7 +448,7 @@ User::match()
 
 See [DSL Usage Guide](specs/DSL_USAGE_GUIDE.md) for comprehensive documentation.
 
-### 🔥 Neo4j-Specific Features
+### Neo4j-Specific Features
 
 #### Column Selection (Neo4j Considerations)
 ```php
@@ -579,7 +499,7 @@ $schema = GraphSchema::introspect();
 // Returns array with: labels, relationshipTypes, propertyKeys, constraints, indexes
 ```
 
-> **💡 Tip:** Use the artisan commands above for interactive CLI exploration!
+> **Tip:** Use the artisan commands above for interactive CLI exploration!
 
 #### Graph Patterns and Paths
 ```php
@@ -601,7 +521,7 @@ $results = DB::connection('graph')->cypher(
 );
 ```
 
-### 🔌 Driver Abstraction & Custom Drivers
+### Driver Abstraction & Custom Drivers
 
 Create your own database drivers by implementing the `GraphDriverInterface`:
 
@@ -626,17 +546,17 @@ DriverManager::register('memgraph', MemgraphDriver::class);
 
 **Built-in Drivers:**
 - **Neo4j** - Full support
-- **Memgraph** - Coming soon
-- **Apache AGE** - Coming soon
+- **Memgraph** - Planned (no ETA)
+- **Apache AGE** - Planned (no ETA)
 
 **Custom Driver Requirements:**
 - Implement `GraphDriverInterface`
 - Provide `ResultSetInterface`, `TransactionInterface`, `CapabilitiesInterface`, `SchemaIntrospectorInterface`
 - Register with `DriverManager::register()`
 
-## ✨ Features
+## Features
 
-### ✅ Complete Eloquent Compatibility (100%)
+### Complete Eloquent Compatibility
 - **All CRUD operations** - create, read, update, delete, upsert
 - **All relationship types** - hasOne, hasMany, belongsTo, belongsToMany, hasManyThrough
 - **Polymorphic relationships** - morphOne, morphMany, morphTo, morphToMany, morphedByMany - all fully working!
@@ -660,7 +580,7 @@ DriverManager::register('memgraph', MemgraphDriver::class);
   - Automatic type detection and transparent querying
   - `whereJsonContains()`, `whereJsonLength()` work seamlessly
 
-### 🚀 Neo4j-Specific Features
+### Neo4j-Specific Features
 - **Cypher DSL Query Builder** - Fluent, type-safe Cypher query builder
   ```php
   // Model-based queries with automatic hydration
@@ -734,33 +654,33 @@ DriverManager::register('memgraph', MemgraphDriver::class);
 - Node-based operations
 - Schema management (indexes, constraints) via `Neo4jBlueprint`
 
-## 📋 Requirements
+## Requirements
 
 - PHP 8.0+
 - Laravel 10.x, 11.x or 12.x
 - Neo4j 4.x or 5.x
 
-## 📚 Documentation
+## Documentation
 
-- **[Quick Start Guide](docs/QUICKSTART.md)** - Get up and running quickly
+- **[Getting Started Guide](docs/getting-started.md)** - Installation and setup
 - **[Configuration Guide](specs/CONFIGURATION.md)** - Comprehensive configuration guide
 - **[DSL Usage Guide](specs/DSL_USAGE_GUIDE.md)** - Cypher DSL query builder guide
 - **[User Documentation](docs/index.md)** - Complete user documentation
 - **[Contributing Guide](specs/CONTRIBUTING.md)** - How to contribute
 
-## 🎯 Why Choose Eloquent Cypher?
+## Why Choose Eloquent Cypher?
 
 1. **Zero Learning Curve** - If you know Eloquent, you know this
 2. **Easy Migration** - Switch from SQL to graph databases without rewriting code
 3. **Best of Both Worlds** - Eloquent's simplicity with graph database power
-4. **Test Coverage** - Comprehensive test coverage (1,513 tests)
+4. **Test Coverage** - Comprehensive test coverage (1,520 tests)
 5. **True Compatibility** - Not a "similar API" - it IS Eloquent
 6. **Multi-Database Support** - Pluggable driver architecture for Neo4j, Memgraph, Apache AGE
 7. **Native Graph Support** - Choose between foreign keys or real graph edges per relationship
 8. **Progressive Enhancement** - Start with foreign keys, upgrade to edges when needed
 9. **Migration Tools** - Built-in commands to safely convert existing data
 
-## ⚠️ Known Limitations
+## Known Limitations
 
 ### Platform Incompatibilities
 - **cursor() method** - Requires PDO streaming which Neo4j doesn't support (use lazy() instead)
@@ -768,11 +688,11 @@ DriverManager::register('memgraph', MemgraphDriver::class);
 
 See [Limitations](docs/LIMITATIONS.md) for detailed explanations.
 
-## 📊 Compatibility Matrix
+## Compatibility Matrix
 
 For a comprehensive method-by-method comparison between Laravel Eloquent and this Neo4j implementation, including test coverage information, see the [Compatibility Matrix](docs/COMPATIBILITY_MATRIX.md).
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Please see [Contributing Guide](specs/CONTRIBUTING.md) for details on:
 - Code of Conduct
@@ -780,7 +700,7 @@ We welcome contributions! Please see [Contributing Guide](specs/CONTRIBUTING.md)
 - How to submit pull requests
 - Coding standards
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Copy PHPUnit configuration (first time only)
@@ -796,14 +716,14 @@ cp phpunit.xml phpunit.xml.dist
 ./vendor/bin/pest tests/Feature/BasicCrudTest.php
 ```
 
-**Note:** Tests require a Neo4j instance running on port 7688. Use the docker-compose.yml provided or customize ports as needed. See the [Quick Start Guide](docs/QUICKSTART.md) for detailed setup.
+**Note:** Tests require a Neo4j instance running on port 7688. Use the docker-compose.yml provided or customize ports as needed. See the [Getting Started Guide](docs/getting-started.md) for detailed setup.
 
-## 📄 License
+## License
 
 This package is open-source software licensed under the [MIT license](LICENSE).
 
-## 🙏 Credits
+## Credits
 
-Built with ❤️ by [Look Systems](https://look.systems)
+Built by [Look Systems](https://look.systems)
 
 Special thanks to the Laravel and Neo4j communities for their amazing tools and support.

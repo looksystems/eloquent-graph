@@ -253,7 +253,7 @@ If you're already comfortable with Eloquent, jump to specific topics:
 
 **Not Just Query Translation**: Native Neo4j features (multi-labels, native edges, Cypher DSL, percentile aggregates) when you need them, standard Eloquent when you don't.
 
-**Production-Ready**: Comprehensive test suite (1,513 tests), battle-tested in real applications, Laravel 10-12 support.
+**Production-Ready**: Comprehensive test suite (1,520 tests), battle-tested in real applications, Laravel 10-12 support.
 
 ## Core Design Decisions
 
