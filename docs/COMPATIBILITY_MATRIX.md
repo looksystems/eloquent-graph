@@ -3,22 +3,20 @@
 ## Overview
 This document provides a comprehensive compatibility matrix comparing Laravel's Illuminate\Database framework with the Neo4j Eloquent adapter implementation.
 
-**Latest Features (v1.3.0 - Updated Oct 25, 2025):**
-- ✅ **Neo4j-Specific Aggregate Functions (NEW!)** - Statistical functions unique to Neo4j for advanced analytics
+**Features:**
+- ✅ **Neo4j-Specific Aggregate Functions** - Statistical functions unique to Neo4j for advanced analytics
   - Laravel-like API following Eloquent patterns - Example: `User::percentileDisc('age', 0.95)`
   - Percentile functions: `percentileDisc()` (discrete), `percentileCont()` (continuous/interpolated)
   - Standard deviation: `stdev()` (sample), `stdevp()` (population)
   - Collection aggregation: `collect()` - gather all values into an array
   - Full integration: Works with WHERE, relationships, withAggregate(), loadAggregate(), and selectRaw()
-  - 34 comprehensive tests with 100% passing rate
-- ✅ **Multi-Label Node Support (NEW!)** - Assign multiple labels to nodes for better organization and performance
+- ✅ **Multi-Label Node Support** - Assign multiple labels to nodes for better organization and performance
   - Laravel-like API with `$labels` property - Example: `protected $labels = ['Person', 'Individual'];`
   - Creates nodes with multiple labels - Example: `(:users:Person:Individual)`
   - Query optimization - Matches on all labels for efficient queries
   - Methods: `getLabels()`, `hasLabel($label)`, `scopeWithLabels($labels)`
   - Full CRUD support - All operations preserve labels automatically
-  - 13 comprehensive tests with 100% passing rate
-- ✅ **Performance Enhancements (v1.2.0)** - 50-70% faster bulk operations matching Laravel MySQL/Postgres performance
+- ✅ **Performance Enhancements** - 50-70% faster bulk operations matching Laravel MySQL/Postgres performance
   - Batch Statement Execution - Insert 1,000 records: 10s → 4s (60% faster)
   - Managed Transactions with automatic retry - write()/read() methods with exponential backoff
   - Enhanced Error Handling - Automatic classification, recovery, and helpful debugging
@@ -28,7 +26,7 @@ This document provides a comprehensive compatibility matrix comparing Laravel's 
   - Artisan Commands: 7 CLI commands for interactive schema exploration and export
   - Schema DDL operations use sequential execution for reliability (prevents connection timeouts)
 - ✅ **Native Graph Relationships** - Choose between foreign keys, native edges, or hybrid mode per relationship
-- ✅ **Full Eloquent Compatibility** - 1,470 tests (1,442 passing + 28 skipped) with 100% functional Eloquent API compatibility
+- ✅ **Full Eloquent Compatibility** - 1,470 tests with 100% functional Eloquent API compatibility
 
 **Status Legend:**
 - ✅ **Implemented** - Custom implementation for Neo4j
@@ -64,7 +62,7 @@ This document provides a comprehensive compatibility matrix comparing Laravel's 
 | cypher() | - | ✅ Native | ✅ | 🧪 RawCypherTest |
 | hasAPOC() | - | ✅ Native | ✅ | 🧪 Neo4jConnectionTest |
 | getPoolStats() | - | ✅ Native | ✅ | 🧪 ConnectionPoolingTest |
-| **Performance Features (v1.2.0 NEW)** | | | | |
+| **Performance Features** | | | | |
 | statements() | - | ✅ Batch Execution | ✅ | 🧪 BatchStatementTest |
 | write() | - | ✅ Managed Tx | ✅ | 🧪 ManagedTransactionTest |
 | read() | - | ✅ Managed Tx | ✅ | 🧪 ManagedTransactionTest |
@@ -106,7 +104,7 @@ This document provides a comprehensive compatibility matrix comparing Laravel's 
 | min() | ✅ | ✅ Custom | ✅ | 🧪 AggregationTest, AggregationExtendedTest |
 | avg() | ✅ | ✅ Custom | ✅ | 🧪 AggregationTest, AggregationExtendedTest |
 | sum() | ✅ | ✅ Custom | ✅ | 🧪 AggregationTest, AggregationExtendedTest |
-| **Neo4j-Specific Aggregates (v1.3.0 NEW)** | | | | |
+| **Neo4j-Specific Aggregates** | | | | |
 | percentileDisc() | - | ✅ Native | ✅ | 🧪 Neo4jAggregatesTest |
 | percentileCont() | - | ✅ Native | ✅ | 🧪 Neo4jAggregatesTest |
 | stdev() | - | ✅ Native | ✅ | 🧪 Neo4jAggregatesTest |
@@ -141,7 +139,7 @@ This document provides a comprehensive compatibility matrix comparing Laravel's 
 | setAttribute() | ✅ | ✅ Override | ✅ | 🧪 MutatorsAccessorsTest |
 | getTable() | ✅ | ✅ Override | ✅ | 🧪 Neo4JModelTest |
 | timestamps | ✅ | ✅ Override | ✅ | 🧪 TimestampsAndCastingTest |
-| **Multi-Label Support (v1.3.0 NEW)** | | | | |
+| **Multi-Label Support** | | | | |
 | getLabels() | - | ✅ Neo4j Native | ✅ | 🧪 MultiLabelNodesTest |
 | hasLabel() | - | ✅ Neo4j Native | ✅ | 🧪 MultiLabelNodesTest |
 | getLabelString() | - | ✅ Neo4j Native | ✅ | 🧪 MultiLabelNodesTest |
@@ -299,9 +297,9 @@ This document provides a comprehensive compatibility matrix comparing Laravel's 
 **Note**: All tests run on Neo4j Community Edition. No Enterprise Edition features required.
 - 0 JSON operation skips (✅ All working with hybrid native/JSON storage!)
 - 0 Critical incompatibilities
-- **+34 tests** added in v1.3.0 for Neo4j-specific aggregate functions (Phase 1.2)
-- **+13 tests** added in v1.3.0 for multi-label node support (Phase 1.1)
-- **+105 tests** added in v1.2.0 for performance features (batch, transactions, errors, parameters)
+- **+34 tests** for Neo4j-specific aggregate functions
+- **+13 tests** for multi-label node support
+- **+105 tests** for performance features (batch, transactions, errors, parameters)
 - **+15 tests** improved/reorganized for test suite stabilization
 
 **Skipped Tests Breakdown:**
@@ -328,7 +326,7 @@ This document provides a comprehensive compatibility matrix comparing Laravel's 
 
 ## Performance Considerations
 
-| Operation | Foreign Key Mode | Native Edge Mode | Hybrid Mode | v1.2.0 Improvements |
+| Operation | Foreign Key Mode | Native Edge Mode | Hybrid Mode | Notes |
 |-----------|-----------------|------------------|------------|-------------------|
 | **Simple Queries** | ✅ Fast | ✅ Fast | ✅ Fast | - |
 | **Relationship Queries** | ⚠️ Slower | ✅ Optimized | ✅ Optimized | - |

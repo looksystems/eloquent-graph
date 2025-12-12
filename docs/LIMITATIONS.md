@@ -1,6 +1,6 @@
 # Eloquent Cypher - Limitations & Workarounds
 
-> **📢 v1.2.0 Update**: Many performance limitations have been resolved! See sections marked with **✅ IMPROVED** for details on batch execution (70% faster), managed transactions with auto-retry, and enhanced error handling.
+> **📢 Note**: Many performance limitations have been resolved! See sections marked with **✅ IMPROVED** for details on batch execution (70% faster), managed transactions with auto-retry, and enhanced error handling.
 
 ## Table of Contents
 - [Fundamental Incompatibilities](#fundamental-incompatibilities)
@@ -462,11 +462,11 @@ User::where('email', 'CONTAINS', 'john')->get();
 
 **Neo4j Default**: READ_COMMITTED (can't change in Community Edition)
 
-**✅ IMPROVED in v1.2.0**: Managed transactions with automatic retry!
+**✅ IMPROVED**: Managed transactions with automatic retry!
 
 **Handling Concurrent Updates**:
 ```php
-// NEW: Use managed transactions with automatic retry (v1.2.0)
+// Use managed transactions with automatic retry
 DB::connection('neo4j')->write(function ($connection) use ($userId, $amount) {
     $user = User::find($userId);
     $user->balance += $amount;
@@ -648,14 +648,11 @@ class Neo4jHelpers
 
 #### 1. Batch Operations
 
-**✅ IMPROVED in v1.2.0**: Native batch execution now matches MySQL/Postgres performance!
+**✅ IMPROVED**: Native batch execution now matches MySQL/Postgres performance!
 
 ```php
-// Before v1.2.0 (slow)
-User::insert($data); // Executed as N individual queries
-
-// After v1.2.0 (fast - 70% improvement!)
-User::insert($data); // Now executes as single batch request
+// Batch operations execute as single batch request (70% faster)
+User::insert($data); // Single batch request, not N individual queries
 
 // Batch upserts also optimized (48% faster)
 User::upsert(

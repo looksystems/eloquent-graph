@@ -1304,7 +1304,7 @@ class GraphConnection extends Connection
             return parent::__get($name);
         }
 
-        trigger_error("Undefined property: ".get_class($this)."::\${$name}", E_USER_NOTICE);
+        trigger_error('Undefined property: '.get_class($this)."::\${$name}", E_USER_NOTICE);
 
         return null;
     }

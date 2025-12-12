@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Goal
 Create a minimal, functionally useful graph database adapter for Laravel Eloquent using Test-Driven Development.
 
-**v2.0 Update:** Package now supports multiple graph databases through a pluggable driver architecture, starting with Neo4j (full support), with Memgraph and Apache AGE coming soon.
+The package supports multiple graph databases through a pluggable driver architecture, starting with Neo4j (full support), with Memgraph and Apache AGE coming soon.
 
 ## Core Principles
 1. **EVERY feature starts with a failing test** - No code is written until a test exists
@@ -128,35 +128,26 @@ php artisan neo4j:migrate-to-edges --model=User --relation=posts
 ### Core Design Pattern
 This package extends Laravel's Eloquent ORM to work with graph databases, prioritizing 100% API compatibility over database-specific optimizations. It uses foreign key relationships (stored as node properties) rather than native graph edges to maintain full Eloquent compatibility.
 
-**v2.0 Architecture:** Driver abstraction layer allows pluggable graph database support through `GraphDriverInterface`, enabling support for multiple graph databases (Neo4j, Memgraph, Apache AGE, custom drivers).
+Driver abstraction layer allows pluggable graph database support through `GraphDriverInterface`, enabling support for multiple graph databases (Neo4j, Memgraph, Apache AGE, custom drivers).
 
 ### Class Hierarchy
 
-**v2.0 (Current):**
 - `GraphModel` extends `Illuminate\Database\Eloquent\Model` (primary)
-  - `Neo4JModel` is an alias to `GraphModel` for backward compatibility
 - `GraphConnection` extends `Illuminate\Database\Connection`
   - Uses `GraphDriverInterface` for database operations
 - `GraphQueryBuilder` extends `Illuminate\Database\Query\Builder`
 - `GraphEloquentBuilder` extends `Illuminate\Database\Eloquent\Builder`
 - `GraphEdgePivot` extends `Illuminate\Database\Eloquent\Relations\Pivot`
 
-**Driver Abstraction Layer (NEW in v2.0):**
+**Driver Abstraction Layer:**
 - `GraphDriverInterface` - Core driver contract
 - `DriverManager` - Factory for creating database drivers
 - `Neo4jDriver` - Neo4j implementation of `GraphDriverInterface`
 - `ResultSetInterface`, `TransactionInterface`, `CapabilitiesInterface`, `SchemaIntrospectorInterface`
 
-**v1.x (Backward Compatible):**
-- `Neo4JModel` extends `Illuminate\Database\Eloquent\Model`
-- `Neo4jConnection` extends `Illuminate\Database\Connection`
-- `Neo4jQueryBuilder` extends `Illuminate\Database\Query\Builder`
-- `Neo4jEloquentBuilder` extends `Illuminate\Database\Eloquent\Builder`
-- `Neo4jEdgePivot` extends `Illuminate\Database\Eloquent\Relations\Pivot`
-
 ### Key Implementation Patterns
 
-1. **Driver Abstraction** (NEW in v2.0)
+1. **Driver Abstraction**
 ```php
 // Configuration selects driver via database_type
 'graph' => [
@@ -205,7 +196,7 @@ $value = $row['property'] ?? $row->property ?? null;
 // Foreign key mode (legacy)
 MATCH (u:users), (p:posts) WHERE p.user_id = u.id
 
-// Native edge mode (NEW default for models with trait)
+// Native edge mode (default for models with trait)
 MATCH (u:users)-[:HAS_POSTS]->(p:posts)
 
 // Hybrid mode (best of both)
@@ -222,15 +213,13 @@ $user->posts()->useNativeEdges()->get();
 protected $useNativeRelationships = true;
 
 // 3. Global config (default: 'hybrid')
-config('database.connections.graph.default_relationship_storage');  // v2.0
-config('database.connections.neo4j.default_relationship_storage');  // v1.x (still works)
+config('database.connections.graph.default_relationship_storage');
 ```
 
 6. **JSON Operations with APOC** (Neo4j-specific)
 ```php
 // Config setting (default: true - auto-detect and use if available)
-config('database.connections.graph.use_apoc_for_json', true);  // v2.0
-config('database.connections.neo4j.use_apoc_for_json', true);  // v1.x (still works)
+config('database.connections.graph.use_apoc_for_json', true);
 
 // APOC mode: Proper JSON parsing and querying
 User::whereJsonContains('preferences->theme', 'dark')->get();
@@ -240,18 +229,18 @@ User::whereJsonLength('skills', '>', 3)->get();
 // Less accurate, limited nested path support
 ```
 
-7. **Batch Execution** (NEW - Quick Wins Phase 1)
+7. **Batch Execution**
 ```php
 // Batch execution for improved performance (70% faster)
-config('database.connections.graph.batch_size', 100);  // v2.0
-config('database.connections.graph.enable_batch_execution', true);  // v2.0
+config('database.connections.graph.batch_size', 100);
+config('database.connections.graph.enable_batch_execution', true);
 
 // Laravel batch operations now execute as single batch request
 User::insert([...100 records...]); // 1 batch request, not 100 queries
 User::upsert([...1000 records...], ['email'], ['name']); // Efficient batch upsert
 ```
 
-8. **Managed Transactions** (NEW - Quick Wins Phase 2)
+8. **Managed Transactions**
 ```php
 // Graph database-optimized managed transactions with automatic retry
 $connection->write(function ($connection) {
@@ -266,7 +255,7 @@ $users = $connection->read(function ($connection) {
 }, $maxRetries = 2);
 
 // Retry configuration with exponential backoff
-config('database.connections.graph.retry', [  // v2.0
+config('database.connections.graph.retry', [
     'max_attempts' => 3,
     'initial_delay_ms' => 100,
     'max_delay_ms' => 5000,
@@ -275,7 +264,7 @@ config('database.connections.graph.retry', [  // v2.0
 ]);
 ```
 
-9. **Enhanced Error Handling** (NEW - Quick Wins Phase 4)
+9. **Enhanced Error Handling**
 ```php
 // Automatic error classification and recovery
 // - Transient errors are automatically retried
@@ -286,12 +275,12 @@ config('database.connections.graph.retry', [  // v2.0
 
 ### Critical Files
 
-**v2.0 Driver Abstraction:**
+**Driver Abstraction:**
 - `src/Contracts/` - All driver interface definitions (GraphDriverInterface, ResultSetInterface, etc.)
 - `src/Drivers/DriverManager.php` - Driver factory and registry
 - `src/Drivers/Neo4j/` - Neo4j driver implementation (8 classes)
 - `src/GraphConnection.php` - Database connection using GraphDriverInterface
-- `src/GraphModel.php` - Core model (alias: Neo4JModel for backward compatibility)
+- `src/GraphModel.php` - Core model
 - `src/GraphQueryBuilder.php` - SQL to Cypher translation
 - `src/GraphEloquentBuilder.php` - Eloquent query building
 
@@ -306,32 +295,17 @@ config('database.connections.graph.retry', [  // v2.0
 - `src/Schema/GraphSchemaBuilder.php` - Schema management using SchemaIntrospectorInterface
 - `src/Schema/GraphSchemaGrammar.php` - Schema DDL generation
 - `src/Schema/GraphBlueprint.php` - Schema blueprint definitions
-- `src/Facades/GraphSchema.php` - Schema facade (alias: Neo4jSchema for backward compatibility)
-
-**v1.x Files (Aliased to v2.0):**
-- `src/Neo4JModel.php` → alias to `GraphModel`
-- `src/Neo4jConnection.php` → alias to `GraphConnection`
-- `src/Neo4jQueryBuilder.php` → alias to `GraphQueryBuilder`
-- `src/Neo4jEloquentBuilder.php` → alias to `GraphEloquentBuilder`
-- `src/Facades/Neo4jSchema.php` → alias to `GraphSchema`
+- `src/Facades/GraphSchema.php` - Schema facade
 
 ## Test Coverage
 - Tests use port 7688 for Neo4j to avoid conflicts
-- **Total tests**: 1,513 tests (1,470 feature tests + 43 driver abstraction tests)
+- **Total tests**: 1,513 tests
 - **Passing**: 1,485 tests (98.1% pass rate, 28 intentionally skipped)
 - **Assertions**: 24,000+ assertions across all tests
 - **Total test files**: ~105 files covering all package functionality
 - **Current grade**: A+ (Excellent, comprehensive, maintainable)
-- **Test Improvement Phase 1**: ✅ COMPLETED (78 new tests added, +6.5% coverage)
-- **Test Improvement Phase 2**: ✅ COMPLETED (19 new tests, relationships & mass ops)
-- **Test Improvement Phase 3**: ✅ COMPLETED (116 new tests, reorganization & negative testing)
-- **Quick Wins Implementation**: ✅ COMPLETED (38+ new tests for batch, transactions, errors)
-- **Multi-Label Support (Oct 25, 2025)**: ✅ COMPLETED (13 new tests, Phase 1.1 feature)
-- **Neo4j Aggregates (Oct 25, 2025)**: ✅ COMPLETED (34 new tests, Phase 1.2 feature)
-- **Driver Abstraction (Oct 31, 2025)**: ✅ COMPLETED (43 new tests, v2.0 driver layer)
 - **See detailed analysis**: [TEST_SUITE_REVIEW.md](TEST_SUITE_REVIEW.md)
 - **See improvement plan**: [TEST_IMPROVEMENT_ROADMAP.md](TEST_IMPROVEMENT_ROADMAP.md)
-- **See Phase 6 completion**: [PHASE_6_COMPLETE.md](PHASE_6_COMPLETE.md)
 
 ### Test Suite Documentation
 
@@ -345,19 +319,9 @@ For comprehensive information about the test suite:
 - Critical issues and recommendations
 
 **[TEST_IMPROVEMENT_ROADMAP.md](TEST_IMPROVEMENT_ROADMAP.md)** - Implementation plan
-- Phase 1: ✅ COMPLETED (Critical fixes - soft deletes, exceptions, CRUD expansion)
-- Phase 2: ✅ COMPLETED (Important improvements - relationships, unit tests)
-- Phase 3: ✅ COMPLETED (Enhancements - file splits, negative tests, polish)
-- Original timeline: 4 weeks, all phases completed in 1 day!
-- Success metrics: 1,195 → 1,408 tests (+213 tests, +17.8%)
-
-**All Phases Achievements (October 25, 2025):**
-- ✅ **Phase 1**: 78 new tests (CRUD expansion, soft deletes, exceptions)
-- ✅ **Phase 2**: 19 new tests (relationships completeness, mass operations)
-- ✅ **Phase 3**: 116 new tests (file organization, negative testing, resilience)
-- ✅ **Large Files Split**: RelationshipExistence & PivotOperations → 4 focused files
-- ✅ **Negative Test Cases**: 27 new tests for error conditions and edge cases
-- ✅ **Overall Grade**: A- → A+
+- Critical fixes - soft deletes, exceptions, CRUD expansion
+- Important improvements - relationships, unit tests
+- Enhancements - file splits, negative tests, polish
 
 ## Known Limitations
 - **APOC Status**: Optional enhancement for JSON operations. Package now uses hybrid native/JSON storage:
@@ -379,7 +343,7 @@ For comprehensive information about the test suite:
 
 ## Working Features
 
-- **Performance Enhancements** (Quick Wins - NEW): ✅
+- **Performance Enhancements**: ✅
   - **Batch Execution**: 50-70% faster bulk operations ✅
     - Insert 100 records: 3s → 0.9s (70% improvement)
     - Upsert 1000 records: 15s → 7.8s (48% improvement)
@@ -400,7 +364,7 @@ For comprehensive information about the test suite:
     - ParameterHelper ensures proper CypherList/CypherMap types
     - Smart detection of array intent
     - Seamless integration with whereIn and array casting
-- **Multi-Label Node Support** (Phase 1.1 - NEW): ✅
+- **Multi-Label Node Support**: ✅
   - **Laravel-like API**: Opt-in multi-label support with `$labels` property ✅
   - **Backward Compatible**: Single-label models work exactly as before ✅
   - **Progressive Enhancement**: Additional labels via `protected $labels = ['Person', 'Individual']` ✅
@@ -413,8 +377,7 @@ For comprehensive information about the test suite:
   - **Full CRUD Support**: Create, Read, Update, Delete all preserve labels ✅
   - **Relationships**: Works seamlessly with all relationship types ✅
   - **Eager Loading**: Multi-label nodes fully supported ✅
-  - 13 comprehensive tests covering all functionality (100% passing) ✅
-- **Neo4j-Specific Aggregate Functions** (Phase 1.2 - NEW): ✅
+- **Neo4j-Specific Aggregate Functions**: ✅
   - **Laravel-like API**: Follows Eloquent's aggregate method patterns ✅
   - **Percentile Functions**: ✅
     - `percentileDisc($column, $percentile)` - Discrete percentile (e.g., 95th percentile)
@@ -435,14 +398,13 @@ For comprehensive information about the test suite:
     - Percentile/stdev functions return `float|null`
     - Collect returns `array`
     - Empty result sets handled correctly (null for percentiles, 0.0 for stdev, [] for collect)
-  - 34 comprehensive tests covering all functionality (100% passing) ✅
 - **Polymorphic Relationships**: Fully working! All `morphOne`, `morphMany`, and `morphTo` relations work perfectly
   - Basic CRUD operations ✅
   - Eager loading ✅
   - Eager loading with limit constraints ✅
   - Relationship existence queries (`has()`, `doesntHave()`) ✅
   - Counting with `withCount()` including `morphOne` ✅
-- **Native Graph Relationships**: Phases 1-4 Complete! ✅
+- **Native Graph Relationships**: ✅
   - Basic relationships (HasMany, BelongsTo, HasOne) with hybrid mode ✅
   - BelongsToMany with virtual pivot objects ✅
   - HasManyThrough with direct graph traversal ✅
@@ -480,7 +442,7 @@ For comprehensive information about the test suite:
     - Better performance for complex nested queries when available ✅
   - **Backward Compatible**: Existing JSON strings continue to work ✅
   - 7 comprehensive tests covering all operations (100% passing) ✅
-- **Cypher DSL Integration** (Phase 1.3 - NEW): ✅
+- **Cypher DSL Integration**: ✅
   - **Fluent Query Builder**: Type-safe Cypher query builder via `wikibase-solutions/php-cypher-dsl` ✅
   - **Laravel Conventions**: Familiar methods (get(), first(), count(), dd(), dump()) ✅
   - **Model Integration**: Static `match()` and instance `matchFrom()` methods ✅

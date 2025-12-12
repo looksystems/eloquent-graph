@@ -227,11 +227,11 @@ $labels = $user->getLabels(); // ['users', 'Person', 'Individual']
     'username' => env('NEO4J_USERNAME', 'neo4j'),
     'password' => env('NEO4J_PASSWORD', 'password'),
 
-    // Performance (v1.2.0+)
+    // Performance
     'batch_size' => 100,                         // Batch size for bulk operations
     'enable_batch_execution' => true,            // 50-70% faster insert/upsert
 
-    // Retry Configuration (v1.2.0+)
+    // Retry Configuration
     'retry' => [
         'max_attempts' => 3,                     // Retry on transient errors
         'initial_delay_ms' => 100,
@@ -402,7 +402,7 @@ RETURN p
 
 ## 6. Performance Tips
 
-### Batch Operations (Automatic - v1.2.0+)
+### Batch Operations
 
 ```php
 // These are automatically batched (50-70% faster!)
@@ -419,7 +419,7 @@ User::upsert(
 ); // Automatically batched
 ```
 
-### Managed Transactions (v1.2.0+)
+### Managed Transactions
 
 ```php
 use Illuminate\Support\Facades\DB;

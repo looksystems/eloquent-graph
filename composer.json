@@ -1,6 +1,6 @@
 {
     "name": "looksystems/eloquent-cypher",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "description": "A production-ready Neo4j adapter for Laravel Eloquent - true drop-in replacement with zero code changes",
     "type": "library",
     "license": "MIT",

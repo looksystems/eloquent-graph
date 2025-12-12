@@ -12,23 +12,19 @@
 
 Switch your Laravel application from MySQL/PostgreSQL to graph databases with zero code changes. Keep using the Eloquent API you know and love while gaining the power of graph databases.
 
-## 🎯 Multi-Database Support (v2.0)
+## 🎯 Multi-Database Support
 
 - **Neo4j** - Full support (Community & Enterprise editions)
-- **Memgraph** - Coming in v2.1
-- **Apache AGE** - Coming in v2.2
+- **Memgraph** - Coming soon
+- **Apache AGE** - Coming soon
 - **Custom Drivers** - Extensible driver architecture
 
-> **Upgrading from v1.x?** See [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md) for upgrade instructions. v2.0 is 100% backward compatible!
+## 🚀 Status: Production Ready
 
-## 🚀 Status: Production Ready (Updated Oct 31, 2025)
-
-- **v2.0.0** - Driver abstraction layer for multi-database support
-- **v1.3.0** - Multi-label node support & Neo4j aggregates (Phase 1.1-1.2)
-- **1,513 tests** (1,470 passing + 43 new driver tests) - 100% functional compatibility
+- **1,513 tests** - 100% functional compatibility
 - **24,000+ assertions** - Comprehensive test coverage
 - **100% Eloquent compatibility** - ALL Eloquent features work perfectly
-- **Driver Abstraction** - NEW! Pluggable driver architecture for multiple graph databases
+- **Driver Abstraction** - Pluggable driver architecture for multiple graph databases
 - **Multi-label nodes** - Assign multiple labels to nodes (e.g., `:users:Person:Individual`)
 - **70% faster bulk operations** - Batch execution matches MySQL/Postgres performance
 - **Automatic retry** - Managed transactions with exponential backoff
@@ -38,31 +34,20 @@ Switch your Laravel application from MySQL/PostgreSQL to graph databases with ze
 - **Schema Introspection** - Explore your graph structure via Facade API or 7 artisan commands
 - **Graph database superpowers** - Full graph capabilities alongside Eloquent
 - **Feature complete** - Including select, addSelect, cursor, whereHas, doesntHave, chunk, lazy, increment, etc.
-- **100% Backward Compatible** - v1.x code works without changes in v2.0
 
 ## 📦 Installation
 
 ```bash
-# Install v2.0 (recommended - multi-database support)
-composer require looksystems/eloquent-cypher:^2.0
-
-# Or install v1.x (Neo4j only)
-composer require looksystems/eloquent-cypher:^1.3
+composer require looksystems/eloquent-cypher
 ```
 
 Register the service provider in `config/app.php`:
 
 ```php
 'providers' => [
-    // v2.0 (recommended)
     Look\EloquentCypher\GraphServiceProvider::class,
-
-    // v1.x (still works in v2.0 - backward compatible)
-    // Look\EloquentCypher\Neo4jServiceProvider::class,
 ],
 ```
-
-> **Note:** In v2.0, `Neo4jServiceProvider` is an alias to `GraphServiceProvider` for backward compatibility.
 
 ## 🐳 Docker Setup (Recommended)
 
@@ -83,15 +68,13 @@ Note: Default test port is 7688. You can customize ports if needed.
 
 ## ⚙️ Configuration
 
-### v2.0 Configuration (Recommended)
-
 Add your graph database connection to `config/database.php`:
 
 ```php
 'connections' => [
     'graph' => [
         'driver' => 'graph',
-        'database_type' => env('GRAPH_DATABASE_TYPE', 'neo4j'),  // NEW: Driver selection
+        'database_type' => env('GRAPH_DATABASE_TYPE', 'neo4j'),
 
         // Connection details
         'host' => env('GRAPH_HOST', 'localhost'),
@@ -100,16 +83,16 @@ Add your graph database connection to `config/database.php`:
         'username' => env('GRAPH_USERNAME', 'neo4j'),
         'password' => env('GRAPH_PASSWORD', 'password'),
 
-        // Performance (NEW in v1.2.0)
+        // Performance
         'batch_size' => env('GRAPH_BATCH_SIZE', 100),
         'enable_batch_execution' => env('GRAPH_ENABLE_BATCH_EXECUTION', true),
 
-        // Native Graph Relationships (NEW in v1.1.0)
+        // Native Graph Relationships
         'default_relationship_storage' => env('GRAPH_RELATIONSHIP_STORAGE', 'hybrid'),
         'auto_create_edges' => true,
         'edge_naming_convention' => 'snake_case_plural', // e.g., HAS_POSTS
 
-        // Retry configuration (NEW in v1.2.0)
+        // Retry configuration
         'retry' => [
             'max_attempts' => 3,
             'initial_delay_ms' => 100,
@@ -124,7 +107,6 @@ Add your graph database connection to `config/database.php`:
 `.env` configuration:
 
 ```env
-# v2.0 Generic Graph Database Configuration
 GRAPH_DATABASE_TYPE=neo4j
 GRAPH_HOST=localhost
 GRAPH_PORT=7687
@@ -139,31 +121,9 @@ GRAPH_ENABLE_BATCH_EXECUTION=true
 GRAPH_RELATIONSHIP_STORAGE=hybrid
 ```
 
-### v1.x Configuration (Still Works in v2.0)
-
-```php
-'connections' => [
-    'neo4j' => [
-        'driver' => 'neo4j',  // In v2.0, automatically uses 'graph' driver with 'database_type' = 'neo4j'
-        'host' => env('NEO4J_HOST', 'localhost'),
-        'port' => env('NEO4J_PORT', 7688),
-        'database' => env('NEO4J_DATABASE', 'neo4j'),
-        'username' => env('NEO4J_USERNAME', 'neo4j'),
-        'password' => env('NEO4J_PASSWORD', 'password'),
-
-        // Native Graph Relationships
-        'default_relationship_storage' => env('NEO4J_RELATIONSHIP_STORAGE', 'hybrid'),
-        'auto_create_edges' => true,
-        'edge_naming_convention' => 'snake_case_plural',
-    ],
-],
-```
-
 > **See also:** [CONFIGURATION.md](CONFIGURATION.md) for comprehensive configuration guide
 
 ## 🏃 Quick Start
-
-### v2.0 (Recommended)
 
 Change your model's base class from `Model` to `GraphModel`:
 
@@ -181,25 +141,6 @@ class User extends GraphModel
     }
 }
 ```
-
-### v1.x (Still Works)
-
-```php
-use Look\EloquentCypher\Neo4JModel;
-
-class User extends Neo4JModel
-{
-    protected $connection = 'neo4j';
-    protected $fillable = ['name', 'email'];
-
-    public function posts()
-    {
-        return $this->hasMany(Post::class);
-    }
-}
-```
-
-> **Note:** In v2.0, `Neo4JModel` is an alias to `GraphModel` for backward compatibility.
 
 That's it! All your existing Eloquent code continues to work.
 
@@ -226,16 +167,16 @@ DB::transaction(function () {
 });
 ```
 
-### 🏷️ Multi-Label Nodes (NEW in v1.3.0)
+### 🏷️ Multi-Label Nodes
 
 Assign multiple labels to your graph nodes for better organization and query performance:
 
 ```php
-use Look\EloquentCypher\GraphModel;  // v2.0
+use Look\EloquentCypher\GraphModel;
 
 class User extends GraphModel
 {
-    protected $connection = 'graph';  // v2.0 (or 'neo4j' for v1.x)
+    protected $connection = 'graph';
     protected $table = 'users';  // Primary label
     protected $labels = ['Person', 'Individual'];  // Additional labels
 
@@ -268,7 +209,7 @@ $users = User::with('posts')->whereHas('posts')->get();
 - **Laravel-Like**: Familiar API with `$labels` property
 - **Full Support**: Works with all Eloquent features (relationships, eager loading, scopes, etc.)
 
-### 🚀 Performance Features (NEW in v1.2.0)
+### 🚀 Performance Features
 
 #### Batch Operations
 ```php
@@ -301,7 +242,7 @@ $users = DB::connection('graph')->read(function ($connection) {
     return User::where('active', true)->with('posts')->get();
 }, $maxRetries = 2);
 
-// Configure retry behavior (v2.0 config)
+// Configure retry behavior
 'graph' => [
     // ... other config ...
     'batch_size' => 100,  // Batch execution size
@@ -315,8 +256,6 @@ $users = DB::connection('graph')->read(function ($connection) {
     ],
 ],
 ```
-
-> **Note:** `DB::connection('neo4j')` still works in v2.0 for backward compatibility.
 
 #### Enhanced Error Handling
 ```php
@@ -339,17 +278,17 @@ if (!DB::connection('graph')->ping()) {
 
 > **Note:** Exception classes are database-specific (e.g., `Neo4jTransientException` for Neo4j driver).
 
-### 🔥 Native Graph Relationships (NEW in v1.1.0)
+### 🔥 Native Graph Relationships
 
 ```php
-use Look\EloquentCypher\GraphModel;  // v2.0
+use Look\EloquentCypher\GraphModel;
 use Look\EloquentCypher\Traits\Neo4jNativeRelationships;
 
 class User extends GraphModel
 {
     use Neo4jNativeRelationships;
 
-    protected $connection = 'graph';  // v2.0 (or 'neo4j' for v1.x)
+    protected $connection = 'graph';
     protected $useNativeRelationships = true; // Enable native edges globally
 
     public function posts()
@@ -533,7 +472,7 @@ If you need native edges for polymorphic relationships:
 
 For more details, see the architectural decision in `SKIPPED_TESTS_ANALYSIS.md`.
 
-### 🔥 Cypher DSL Query Builder (NEW in v1.3.0)
+### 🔥 Cypher DSL Query Builder
 
 Build complex Cypher queries using a fluent, type-safe API:
 
@@ -612,7 +551,7 @@ $stats = User::selectRaw('n.city as city, COUNT(*) as user_count')
 
 #### Schema Introspection (Programmatic)
 ```php
-use Look\EloquentCypher\Facades\GraphSchema;  // v2.0 (Neo4jSchema still works)
+use Look\EloquentCypher\Facades\GraphSchema;
 
 // Get all node labels in the database
 $labels = GraphSchema::getAllLabels();
@@ -640,7 +579,6 @@ $schema = GraphSchema::introspect();
 ```
 
 > **💡 Tip:** Use the artisan commands above for interactive CLI exploration!
-> **Note:** `Neo4jSchema` facade still works in v2.0 for backward compatibility.
 
 #### Graph Patterns and Paths
 ```php
@@ -662,7 +600,7 @@ $results = DB::connection('graph')->cypher(
 );
 ```
 
-### 🔌 Driver Abstraction & Custom Drivers (NEW in v2.0)
+### 🔌 Driver Abstraction & Custom Drivers
 
 Create your own database drivers by implementing the `GraphDriverInterface`:
 
@@ -686,9 +624,9 @@ DriverManager::register('memgraph', MemgraphDriver::class);
 ```
 
 **Built-in Drivers:**
-- **Neo4j** - Full support (v2.0)
-- **Memgraph** - Coming in v2.1
-- **Apache AGE** - Coming in v2.2
+- **Neo4j** - Full support
+- **Memgraph** - Coming soon
+- **Apache AGE** - Coming soon
 
 **Custom Driver Requirements:**
 - Implement `GraphDriverInterface`
@@ -724,7 +662,7 @@ See [DRIVER_IMPLEMENTATION_GUIDE.md](docs/DRIVER_IMPLEMENTATION_GUIDE.md) for de
   - `whereJsonContains()`, `whereJsonLength()` work seamlessly
 
 ### 🚀 Neo4j-Specific Features
-- **Cypher DSL Query Builder** - Fluent, type-safe Cypher query builder (v1.3.0)
+- **Cypher DSL Query Builder** - Fluent, type-safe Cypher query builder
   ```php
   // Model-based queries with automatic hydration
   $users = User::match()
@@ -747,7 +685,7 @@ See [DRIVER_IMPLEMENTATION_GUIDE.md](docs/DRIVER_IMPLEMENTATION_GUIDE.md) for de
 
   // See DSL_USAGE_GUIDE.md for comprehensive documentation
   ```
-- **Neo4j Aggregate Functions** - Statistical functions unique to Neo4j (v1.3.0)
+- **Neo4j Aggregate Functions** - Statistical functions unique to Neo4j
   ```php
   // Percentile calculations
   $p95Age = User::percentileDisc('age', 0.95);  // 95th percentile (discrete)
@@ -775,13 +713,13 @@ See [DRIVER_IMPLEMENTATION_GUIDE.md](docs/DRIVER_IMPLEMENTATION_GUIDE.md) for de
       stdev(n.salary) as salary_stdev
   ')->first();
   ```
-- **Native Graph Relationships** - Use real Neo4j edges instead of foreign keys (v1.1.0)
+- **Native Graph Relationships** - Use real Neo4j edges instead of foreign keys
   - Choose per-relationship: foreign keys or native edges
   - Migration tools to convert existing data
   - Edge properties support (pivot data on the edge)
   - Direct graph traversal for HasManyThrough
   - Compatibility checker for safe migrations
-- **Hybrid Array Storage** - Intelligent storage optimization (v1.1.0)
+- **Hybrid Array Storage** - Intelligent storage optimization
   - Flat arrays as native Neo4j LISTs (no APOC needed)
   - Nested structures as JSON (enhanced by APOC when available)
   - Automatic type detection for optimal performance
@@ -806,10 +744,8 @@ See [DRIVER_IMPLEMENTATION_GUIDE.md](docs/DRIVER_IMPLEMENTATION_GUIDE.md) for de
 ## 📚 Documentation
 
 - **[QUICKSTART.md](QUICKSTART.md)** - Get up and running quickly
-- **[MIGRATION_GUIDE.md](MIGRATION_GUIDE.md)** - Upgrade from v1.x to v2.0 (NEW)
-- **[CONFIGURATION.md](CONFIGURATION.md)** - Comprehensive configuration guide (NEW)
+- **[CONFIGURATION.md](CONFIGURATION.md)** - Comprehensive configuration guide
 - **[DSL_USAGE_GUIDE.md](DSL_USAGE_GUIDE.md)** - Cypher DSL query builder guide
-- **[CHANGELOG.md](CHANGELOG.md)** - Release history and changes
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute
 
 ## 🎯 Why Choose Eloquent Cypher?
@@ -819,11 +755,10 @@ See [DRIVER_IMPLEMENTATION_GUIDE.md](docs/DRIVER_IMPLEMENTATION_GUIDE.md) for de
 3. **Best of Both Worlds** - Eloquent's simplicity with graph database power
 4. **Production Ready** - Comprehensive test coverage (1,513 tests) and battle-tested
 5. **True Compatibility** - Not a "similar API" - it IS Eloquent
-6. **Multi-Database Support** - Pluggable driver architecture for Neo4j, Memgraph, Apache AGE (NEW in v2.0)
+6. **Multi-Database Support** - Pluggable driver architecture for Neo4j, Memgraph, Apache AGE
 7. **Native Graph Support** - Choose between foreign keys or real graph edges per relationship
 8. **Progressive Enhancement** - Start with foreign keys, upgrade to edges when needed
 9. **Migration Tools** - Built-in commands to safely convert existing data
-10. **100% Backward Compatible** - v1.x code works without changes in v2.0
 
 ## ⚠️ Known Limitations
 

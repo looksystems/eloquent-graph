@@ -303,6 +303,7 @@ class MigrateToEdgesCommand extends Command
                 if ($this->output) {
                     $this->warn("Skipping method {$method->getName()}: {$e->getMessage()}");
                 }
+
                 continue;
             }
         }
