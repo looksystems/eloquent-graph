@@ -13,16 +13,19 @@ use App\Models\User;
 
 // Basic where
 $users = User::where('name', 'John')->get();
+// Cypher: MATCH (n:users) WHERE n.name = 'John' RETURN n
 
 // Multiple conditions
 $users = User::where('name', 'John')
     ->where('age', '>', 25)
     ->get();
+// Cypher: MATCH (n:users) WHERE n.name = 'John' AND n.age > 25 RETURN n
 
 // Or conditions
 $users = User::where('name', 'John')
     ->orWhere('name', 'Jane')
     ->get();
+// Cypher: MATCH (n:users) WHERE n.name = 'John' OR n.name = 'Jane' RETURN n
 ```
 
 ### All Operators Work
@@ -46,13 +49,11 @@ User::where('email', 'LIKE', '%@example.com')->get();
 ```php
 // whereIn
 $users = User::whereIn('status', ['active', 'pending'])->get();
+// Cypher: MATCH (n:users) WHERE n.status IN ['active', 'pending'] RETURN n
 
 // whereNotIn
 $users = User::whereNotIn('role', ['guest', 'banned'])->get();
-
-// Works with any array
-$ids = [1, 2, 3, 4, 5];
-$users = User::whereIn('id', $ids)->get();
+// Cypher: MATCH (n:users) WHERE NOT n.role IN ['guest', 'banned'] RETURN n
 ```
 
 ### NULL Checks
@@ -129,6 +130,7 @@ $users = User::where('status', 'active')
               ->orWhere('role', 'moderator');
     })
     ->get();
+// Cypher: MATCH (n:users) WHERE n.status = 'active' AND (n.role = 'admin' OR n.role = 'moderator') RETURN n
 
 // Multiple nested groups
 $posts = Post::where('published', true)

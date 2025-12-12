@@ -11,7 +11,8 @@ Complete guide to creating models and performing CRUD operations with Eloquent C
 5. [Mutators & Accessors](#mutators--accessors)
 6. [Mass Assignment](#mass-assignment)
 7. [Soft Deletes](#soft-deletes)
-8. [Next Steps](#next-steps)
+8. [Common Pitfalls](#common-pitfalls)
+9. [Next Steps](#next-steps)
 
 ---
 
@@ -811,6 +812,81 @@ expect(User::find($userId))->not->toBeNull(); // Found again
 // Force delete
 $user->forceDelete();
 expect(User::withTrashed()->find($userId))->toBeNull(); // Gone forever
+```
+
+---
+
+## Common Pitfalls
+
+Avoid these common mistakes when working with Eloquent Cypher:
+
+### 1. Forgetting the Connection
+
+```php
+// ❌ Wrong - uses default MySQL connection
+class User extends GraphModel
+{
+    protected $fillable = ['name'];
+}
+
+// ✅ Correct - explicitly set graph connection
+class User extends GraphModel
+{
+    protected $connection = 'graph';
+    protected $fillable = ['name'];
+}
+```
+
+### 2. Auto-Increment Assumption
+
+```php
+// ❌ Wrong - Neo4j doesn't auto-increment
+class User extends GraphModel
+{
+    protected $connection = 'graph';
+    // Missing incrementing = false
+}
+
+// ✅ Correct
+class User extends GraphModel
+{
+    protected $connection = 'graph';
+    public $incrementing = false;
+    protected $keyType = 'int';
+}
+```
+
+### 3. Wrong Soft Delete Trait
+
+```php
+// ❌ Wrong - Laravel's trait doesn't work with graph
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+// ✅ Correct - use graph-specific trait
+use Look\EloquentCypher\Concerns\GraphSoftDeletes;
+```
+
+### 4. Raw Query Syntax
+
+```php
+// ❌ Wrong - SQL syntax in whereRaw
+User::whereRaw('age > 25')->get();
+
+// ✅ Correct - Cypher syntax with n. prefix
+User::whereRaw('n.age > 25')->get();
+```
+
+### 5. Accessing Non-Existent Relationships
+
+```php
+// ❌ Fails silently or errors - relationship not defined
+$user->comments; // If comments() method doesn't exist
+
+// ✅ Always define relationships in your model first
+public function comments()
+{
+    return $this->hasMany(Comment::class);
+}
 ```
 
 ---

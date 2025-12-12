@@ -4,19 +4,28 @@
 
 Version: 1.3.0 | Status: Production Ready | Coverage: 87 tests (100% passing)
 
+## Quick Navigation
+
+**New to DSL?** Start with [Getting Started](#getting-started) and [Basic Query Building](#basic-query-building).
+
+**Building graph queries?** See [Graph Traversal Patterns](#graph-traversal-patterns) and [Path Finding](#path-finding).
+
+**Need examples?** Jump to [Complete Real-World Examples](#complete-real-world-examples).
+
 ## Table of Contents
 
-1. [Introduction & Architecture](#introduction--architecture)
-2. [Getting Started](#getting-started)
-3. [Basic Query Building](#basic-query-building)
-4. [Graph Traversal Patterns](#graph-traversal-patterns)
-5. [Path Finding](#path-finding)
-6. [Advanced DSL Features](#advanced-dsl-features)
-7. [Model Integration & Hydration](#model-integration--hydration)
-8. [Macros & Extensibility](#macros--extensibility)
-9. [Performance & Best Practices](#performance--best-practices)
-10. [Complete Real-World Examples](#complete-real-world-examples)
-11. [API Reference](#api-reference)
+| Section | Difficulty | Use For |
+|---------|------------|---------|
+| [Getting Started](#getting-started) | 🟢 Beginner | First DSL query, setup |
+| [Basic Query Building](#basic-query-building) | 🟢 Beginner | WHERE, ORDER, LIMIT |
+| [Graph Traversal Patterns](#graph-traversal-patterns) | 🟡 Intermediate | Relationships, paths |
+| [Path Finding](#path-finding) | 🟡 Intermediate | Shortest path, all paths |
+| [Model Integration & Hydration](#model-integration--hydration) | 🟡 Intermediate | Type casting, collections |
+| [Macros & Extensibility](#macros--extensibility) | 🟡 Intermediate | Reusable patterns |
+| [Advanced DSL Features](#advanced-dsl-features) | 🔴 Advanced | Aggregations, subqueries |
+| [Performance & Best Practices](#performance--best-practices) | 🔴 Advanced | Optimization tips |
+| [Complete Real-World Examples](#complete-real-world-examples) | All | Social network, recommendations |
+| [API Reference](#api-reference) | All | Method lookup |
 
 ---
 

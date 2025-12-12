@@ -41,19 +41,9 @@ Switch your Laravel application from MySQL/PostgreSQL to graph databases with ze
 
 ## Status
 
-- **1,520 tests** - Comprehensive functional coverage
-- **24,000+ assertions** - Thorough test coverage
-- **Near-complete Eloquent compatibility** - Most Eloquent features work identically (see [Limitations](#known-limitations))
-- **Driver Abstraction** - Pluggable driver architecture for multiple graph databases
-- **Multi-label nodes** - Assign multiple labels to nodes (e.g., `:users:Person:Individual`)
-- **70% faster bulk operations** - Batch execution matches MySQL/Postgres performance
-- **Automatic retry** - Managed transactions with exponential backoff
-- **Enhanced error handling** - Better classification, recovery, and debugging
-- **Native Graph Edges** - Choose between foreign keys or real graph edges per relationship
-- **Hybrid Array Storage** - Intelligent storage of arrays as native types or JSON (APOC optional)
-- **Schema Introspection** - Explore your graph structure via Facade API or 7 artisan commands
-- **Graph database superpowers** - Full graph capabilities alongside Eloquent
-- **Feature complete** - select, addSelect, cursor, whereHas, doesntHave, chunk, lazy, increment, etc.
+**Production Ready** - 1,520 passing tests, 24,000+ assertions, near-complete Eloquent compatibility.
+
+See [Features](#features) for capabilities and [Limitations](#known-limitations) for platform differences.
 
 ## Installation
 
@@ -124,24 +114,7 @@ Add your graph database connection to `config/database.php`:
 ],
 ```
 
-`.env` configuration:
-
-```env
-GRAPH_DATABASE_TYPE=neo4j
-GRAPH_HOST=localhost
-GRAPH_PORT=7687
-GRAPH_USERNAME=neo4j
-GRAPH_PASSWORD=password
-
-# Performance
-GRAPH_BATCH_SIZE=100
-GRAPH_ENABLE_BATCH_EXECUTION=true
-
-# Relationships
-GRAPH_RELATIONSHIP_STORAGE=hybrid
-```
-
-> **See also:** [Configuration Guide](specs/CONFIGURATION.md) for comprehensive configuration guide
+See [Configuration Guide](specs/CONFIGURATION.md) for all options including retry strategies and relationship storage modes.
 
 ## Quick Start
 
@@ -166,68 +139,26 @@ That's it! All your existing Eloquent code continues to work.
 
 ## Usage Examples
 
-### Standard Eloquent Operations
-
-```php
-// Everything works exactly like Eloquent
-$user = User::create(['name' => 'John', 'email' => 'john@example.com']);
-$users = User::where('age', '>', 25)->orderBy('name')->get();
-$user->posts()->create(['title' => 'My First Post']);
-$posts = User::with('posts')->find($id)->posts;
-
-// Relationships work as expected
-$user->roles()->attach($roleId);
-$comments = $user->posts()->with('comments')->get();
-$usersWithPosts = User::whereHas('posts')->withCount('posts')->get();
-
-// Transactions for data consistency
-DB::transaction(function () {
-    $user = User::create(['name' => 'Jane']);
-    $user->posts()->create(['title' => 'Post']);
-});
-```
-
 ### Multi-Label Nodes
 
-Assign multiple labels to your graph nodes for better organization and query performance:
-
 ```php
-use Look\EloquentCypher\GraphModel;
-
 class User extends GraphModel
 {
     protected $connection = 'graph';
-    protected $table = 'users';  // Primary label
+    protected $table = 'users';                    // Primary label
     protected $labels = ['Person', 'Individual'];  // Additional labels
-
-    protected $fillable = ['name', 'email', 'age'];
 }
 
-// Creates node with labels: (:users:Person:Individual)
+// Creates node: (:users:Person:Individual)
 $user = User::create(['name' => 'John', 'email' => 'john@example.com']);
+$user->getLabels();        // ['users', 'Person', 'Individual']
+$user->hasLabel('Person'); // true
 
-// Check labels
-$user->getLabels();  // ['users', 'Person', 'Individual']
-$user->hasLabel('Person');  // true
-$user->hasLabel('Admin');   // false
-
-// Query with specific label subset
+// Query with specific labels
 $users = User::withLabels(['users', 'Person'])->get();
-
-// All CRUD operations preserve labels automatically
-$user->update(['name' => 'Jane']);  // Keeps all labels
-$user->delete();  // Deletes node with all labels
-
-// Works seamlessly with relationships, eager loading, etc.
-$user->posts()->create(['title' => 'My Post']);
-$users = User::with('posts')->whereHas('posts')->get();
 ```
 
-**Benefits:**
-- **Query Optimization**: Queries match on all labels for better performance
-- **Backward Compatible**: Single-label models work exactly as before
-- **Laravel-Like**: Familiar API with `$labels` property
-- **Full Support**: Works with all Eloquent features (relationships, eager loading, scopes, etc.)
+All CRUD, relationships, and eager loading preserve labels automatically.
 
 ### Performance Features
 
@@ -261,20 +192,6 @@ $result = DB::connection('graph')->write(function ($connection) {
 $users = DB::connection('graph')->read(function ($connection) {
     return User::where('active', true)->with('posts')->get();
 }, $maxRetries = 2);
-
-// Configure retry behavior
-'graph' => [
-    // ... other config ...
-    'batch_size' => 100,  // Batch execution size
-    'enable_batch_execution' => true,
-    'retry' => [
-        'max_attempts' => 3,
-        'initial_delay_ms' => 100,
-        'max_delay_ms' => 5000,
-        'multiplier' => 2.0,
-        'jitter' => true,  // Prevent thundering herd
-    ],
-],
 ```
 
 #### Enhanced Error Handling
@@ -351,33 +268,12 @@ php artisan neo4j:migrate-to-edges --model=User --relation=posts
 #### Schema Introspection Commands
 
 ```bash
-# Display complete schema overview
-php artisan neo4j:schema
-php artisan neo4j:schema --json       # JSON output
-php artisan neo4j:schema --compact    # Minimal output
-
-# List all node labels
-php artisan neo4j:schema:labels
-php artisan neo4j:schema:labels --count  # Show node counts
-
-# List all relationship types
-php artisan neo4j:schema:relationships
-php artisan neo4j:schema:relationships --count  # Show relationship counts
-
-# List all property keys
-php artisan neo4j:schema:properties
-
-# List all constraints
-php artisan neo4j:schema:constraints
-php artisan neo4j:schema:constraints --type=UNIQUENESS  # Filter by type
-
-# List all indexes
-php artisan neo4j:schema:indexes
-php artisan neo4j:schema:indexes --type=RANGE  # Filter by type
-
-# Export schema to file
-php artisan neo4j:schema:export schema.json
-php artisan neo4j:schema:export schema.yaml --format=yaml
+php artisan neo4j:schema                    # Full schema overview
+php artisan neo4j:schema:labels --count     # Node labels with counts
+php artisan neo4j:schema:relationships      # Relationship types
+php artisan neo4j:schema:constraints        # Constraints
+php artisan neo4j:schema:indexes            # Indexes
+php artisan neo4j:schema:export schema.json # Export to file
 ```
 
 ### Polymorphic Relationships
@@ -395,130 +291,49 @@ $comment->commentable; // Returns Post or Video
 
 ### Cypher DSL Query Builder
 
-Build complex Cypher queries using a fluent, type-safe API:
+Build type-safe Cypher queries with IDE autocomplete:
 
 ```php
-use Look\EloquentCypher\Facades\Cypher;
 use WikibaseSolutions\CypherDSL\Query;
 
-// Basic DSL query
-$users = Cypher::query()
-    ->match(Query::node('users')->named('n'))
-    ->where(Query::variable('n')->property('age')->gt(Query::literal(25)))
-    ->returning(Query::variable('n'))
-    ->get();
-
 // Model-based queries with automatic hydration
-$activeUsers = User::match()
-    ->where(Query::variable('n')->property('active')->equals(Query::literal(true)))
-    ->get(); // Returns Collection<User>
-
-// Instance traversal from a specific node
-$user = User::find(1);
-$following = $user->matchFrom()
-    ->outgoing('FOLLOWS', 'users')
+$users = User::match()
+    ->where(Query::variable('n')->property('age')->gt(Query::literal(25)))
     ->get(); // Collection<User>
 
+// Graph traversals from specific nodes
+$following = $user->matchFrom()->outgoing('FOLLOWS', 'users')->get();
+
 // Path finding
-$path = $user->matchFrom()
-    ->shortestPath(User::find(10), 'FOLLOWS')
-    ->returning(Query::variable('path'))
-    ->get();
-
-// Register reusable macros
-Neo4jCypherDslBuilder::macro('activeUsers', function () {
-    return $this->where(
-        Query::variable('n')->property('active')->equals(Query::literal(true))
-    );
-});
-
-// Debug helpers
-User::match()
-    ->where(Query::variable('n')->property('age')->gt(Query::literal(25)))
-    ->dd(); // Dump query and die
+$path = $user->matchFrom()->shortestPath($target, 'KNOWS')->get();
 ```
 
-**Features:**
-- **Type-Safe**: Full IDE autocomplete and type checking
-- **Laravel-Like**: Familiar get(), first(), count(), dd(), dump() methods
-- **Model Hydration**: Automatic model instantiation with casts
-- **Graph Patterns**: Built-in helpers for traversals and path finding
-- **Macros**: Create reusable query patterns
-- **Backward Compatible**: Existing raw Cypher usage unchanged
-
-See [DSL Usage Guide](specs/DSL_USAGE_GUIDE.md) for comprehensive documentation.
+See [Cypher DSL Guide](docs/cypher-dsl.md) for traversals, macros, and advanced patterns.
 
 ### Neo4j-Specific Features
-
-#### Column Selection (Neo4j Considerations)
-```php
-// Use selectRaw for aliases (avoids double aliasing)
-$users = User::selectRaw('n.name as user_name, n.email as contact_email')->get();
-
-// Raw expressions need n. prefix
-$results = User::selectRaw('n.age * 2 as double_age, n.age')
-    ->orderBy('age')
-    ->get();
-
-// JSON properties are auto-decoded
-$user = User::select('name', 'metadata')->first();
-$metadata = $user->metadata; // Already decoded array/object
-
-// GROUP BY works but test thoroughly
-$stats = User::selectRaw('n.city as city, COUNT(*) as user_count')
-    ->groupBy('city')
-    ->get();
-```
 
 #### Schema Introspection (Programmatic)
 ```php
 use Look\EloquentCypher\Facades\GraphSchema;
 
-// Get all node labels in the database
-$labels = GraphSchema::getAllLabels();
-// ['User', 'Post', 'Comment']
-
-// Get all relationship types
-$types = GraphSchema::getAllRelationshipTypes();
-// ['WROTE', 'LIKES', 'FOLLOWS']
-
-// Get all property keys
-$keys = GraphSchema::getAllPropertyKeys();
-// ['id', 'name', 'email', 'title', 'content']
-
-// Get all constraints with details
-$constraints = GraphSchema::getConstraints();
-// [['name' => 'user_email_unique', 'type' => 'UNIQUENESS', ...]]
-
-// Get all indexes with details
-$indexes = GraphSchema::getIndexes();
-// [['name' => 'user_name_index', 'type' => 'RANGE', ...]]
-
-// Get complete schema in one call
-$schema = GraphSchema::introspect();
-// Returns array with: labels, relationshipTypes, propertyKeys, constraints, indexes
+GraphSchema::getAllLabels();           // ['User', 'Post', 'Comment']
+GraphSchema::getAllRelationshipTypes(); // ['WROTE', 'LIKES', 'FOLLOWS']
+GraphSchema::getConstraints();          // Constraint details
+GraphSchema::introspect();              // Complete schema in one call
 ```
-
-> **Tip:** Use the artisan commands above for interactive CLI exploration!
 
 #### Graph Patterns and Paths
 ```php
-// Graph pattern matching
+// Pattern matching
 $results = User::joinPattern('(u:users), (p:posts)')
     ->where('p.user_id = u.id')
-    ->select(['u.name', 'p.title'])
     ->get();
 
-// Shortest path queries
-$path = User::shortestPath()
-    ->from($userA->id)
-    ->to($userB->id, 'friends')
-    ->get();
+// Shortest path
+$path = User::shortestPath()->from($userA->id)->to($userB->id, 'friends')->get();
 
-// Raw Cypher for complex queries
-$results = DB::connection('graph')->cypher(
-    'MATCH (u:users)-[:POSTED]->(p:posts) RETURN u, p LIMIT 10'
-);
+// Raw Cypher
+$results = DB::connection('graph')->cypher('MATCH (u:users) RETURN u LIMIT 10');
 ```
 
 ### Driver Abstraction & Custom Drivers
@@ -581,78 +396,13 @@ DriverManager::register('memgraph', MemgraphDriver::class);
   - `whereJsonContains()`, `whereJsonLength()` work seamlessly
 
 ### Neo4j-Specific Features
-- **Cypher DSL Query Builder** - Fluent, type-safe Cypher query builder
-  ```php
-  // Model-based queries with automatic hydration
-  $users = User::match()
-      ->where(Query::variable('n')->property('age')->gt(Query::literal(25)))
-      ->get(); // Collection<User>
-
-  // Graph traversals from specific nodes
-  $following = $user->matchFrom()->outgoing('FOLLOWS', 'users')->get();
-
-  // Path finding algorithms
-  $path = $user->matchFrom()->shortestPath($target, 'KNOWS')->get();
-
-  // Facade for convenience
-  $results = Cypher::query()->match(Query::node('users'))->get();
-
-  // Extensible with macros
-  User::macro('activeUsers', function () {
-      return $this->where(Query::variable('n')->property('active')->equals(Query::literal(true)));
-  });
-
-  // See DSL_USAGE_GUIDE.md for comprehensive documentation
-  ```
-- **Neo4j Aggregate Functions** - Statistical functions unique to Neo4j
-  ```php
-  // Percentile calculations
-  $p95Age = User::percentileDisc('age', 0.95);  // 95th percentile (discrete)
-  $medianAge = User::percentileCont('age', 0.5); // Median (continuous/interpolated)
-
-  // Standard deviation
-  $ageStdDev = User::stdev('salary');    // Sample standard deviation
-  $ageStdDevP = User::stdevp('salary');  // Population standard deviation
-
-  // Collect values into array
-  $allNames = User::collect('name');  // Returns array of all names
-
-  // Works with WHERE clauses and relationships
-  $p95Views = User::where('active', true)->posts()->percentileDisc('views', 0.95);
-
-  // Use in withAggregate and loadAggregate
-  $users = User::withAggregate('posts', 'views', 'stdev')->get();
-  $user->loadAggregate('posts', 'views', 'percentileDisc');
-
-  // Combine with standard aggregates in selectRaw
-  $stats = User::selectRaw('
-      COUNT(*) as total,
-      AVG(n.age) as avg_age,
-      percentileDisc(n.age, 0.95) as p95_age,
-      stdev(n.salary) as salary_stdev
-  ')->first();
-  ```
-- **Native Graph Relationships** - Use real Neo4j edges instead of foreign keys
-  - Choose per-relationship: foreign keys or native edges
-  - Migration tools to convert existing data
-  - Edge properties support (pivot data on the edge)
-  - Direct graph traversal for HasManyThrough
-  - Compatibility checker for safe migrations
-- **Hybrid Array Storage** - Intelligent storage optimization
-  - Flat arrays as native Neo4j LISTs (no APOC needed)
-  - Nested structures as JSON (enhanced by APOC when available)
-  - Automatic type detection for optimal performance
-  - Full backward compatibility with existing data
-- **Schema Introspection** - Explore your graph structure
-  - Programmatic API via `Neo4jSchema` facade
-  - 7 artisan commands for CLI access
-  - Export schemas to JSON/YAML
-- Graph pattern matching with `joinPattern()`
-- Shortest path algorithms via `ShortestPathBuilder`
-- Variable-length relationships via `VariablePathBuilder`
-- Raw Cypher queries with `DB::connection('neo4j')->cypher()`
-- Node-based operations
-- Schema management (indexes, constraints) via `Neo4jBlueprint`
+- **Cypher DSL** - Type-safe query builder with graph traversals and path finding
+- **Neo4j Aggregates** - percentileDisc, percentileCont, stdev, stdevp, collect
+- **Native Graph Relationships** - Real Neo4j edges with edge properties and migration tools
+- **Hybrid Array Storage** - Flat arrays as native LISTs, nested as JSON (APOC optional)
+- **Schema Introspection** - GraphSchema facade + 7 artisan commands
+- **Graph Patterns** - joinPattern(), shortestPath, variable-length relationships
+- **Raw Cypher** - DB::connection('graph')->cypher() for complex queries
 
 ## Requirements
 
@@ -662,61 +412,43 @@ DriverManager::register('memgraph', MemgraphDriver::class);
 
 ## Documentation
 
-- **[Getting Started Guide](docs/getting-started.md)** - Installation and setup
-- **[Configuration Guide](specs/CONFIGURATION.md)** - Comprehensive configuration guide
-- **[DSL Usage Guide](specs/DSL_USAGE_GUIDE.md)** - Cypher DSL query builder guide
-- **[User Documentation](docs/index.md)** - Complete user documentation
-- **[Contributing Guide](specs/CONTRIBUTING.md)** - How to contribute
-
-## Why Choose Eloquent Cypher?
-
-1. **Zero Learning Curve** - If you know Eloquent, you know this
-2. **Easy Migration** - Switch from SQL to graph databases without rewriting code
-3. **Best of Both Worlds** - Eloquent's simplicity with graph database power
-4. **Test Coverage** - Comprehensive test coverage (1,520 tests)
-5. **True Compatibility** - Not a "similar API" - it IS Eloquent
-6. **Multi-Database Support** - Pluggable driver architecture for Neo4j, Memgraph, Apache AGE
-7. **Native Graph Support** - Choose between foreign keys or real graph edges per relationship
-8. **Progressive Enhancement** - Start with foreign keys, upgrade to edges when needed
-9. **Migration Tools** - Built-in commands to safely convert existing data
+- **[User Documentation](docs/index.md)** - Complete guides and reference
+- **[Getting Started](docs/getting-started.md)** - Installation and setup
+- **[Cypher DSL Guide](docs/cypher-dsl.md)** - Type-safe query builder
+- **[Configuration Guide](specs/CONFIGURATION.md)** - All options
+- **[Compatibility Matrix](docs/COMPATIBILITY_MATRIX.md)** - Method-by-method status
+- **[Contributing](specs/CONTRIBUTING.md)** - How to contribute
 
 ## Known Limitations
 
-### Platform Incompatibilities
-- **cursor() method** - Requires PDO streaming which Neo4j doesn't support (use lazy() instead)
-- **JSON operations** - Optional: APOC plugin enhances nested JSON queries (all tests pass with or without APOC)
+### Platform Differences
+- **cursor()** - Use `lazy()` instead (Neo4j doesn't support PDO streaming)
+- **APOC** - Optional enhancement for nested JSON queries; all tests pass without it
+- **Nested JSON updates** - Update entire parent property, not nested paths
+- **Schema DDL** - Constraints/indexes execute sequentially for reliability
 
-See [Limitations](docs/LIMITATIONS.md) for detailed explanations.
+### When to Use Graph Databases
+Graph databases excel at:
+- Deep relationship traversals (social networks, recommendations)
+- Variable-length path queries (friend-of-friend, shortest path)
+- Schema flexibility with evolving data models
 
-## Compatibility Matrix
+Consider SQL for simple CRUD with minimal relationships.
 
-For a comprehensive method-by-method comparison between Laravel Eloquent and this Neo4j implementation, including test coverage information, see the [Compatibility Matrix](docs/COMPATIBILITY_MATRIX.md).
+See [Limitations](docs/LIMITATIONS.md) for workarounds and details.
 
 ## Contributing
 
-We welcome contributions! Please see [Contributing Guide](specs/CONTRIBUTING.md) for details on:
-- Code of Conduct
-- Development process
-- How to submit pull requests
-- Coding standards
+See [Contributing Guide](specs/CONTRIBUTING.md) for development process and coding standards.
 
 ## Testing
 
 ```bash
-# Copy PHPUnit configuration (first time only)
-cp phpunit.xml phpunit.xml.dist
-
-# Run all tests (sequentially)
-./vendor/bin/pest
-
-# Run with coverage report
-./vendor/bin/pest --coverage-text
-
-# Run specific test
-./vendor/bin/pest tests/Feature/BasicCrudTest.php
+./vendor/bin/pest              # Run all tests
+./vendor/bin/pest --coverage   # With coverage report
 ```
 
-**Note:** Tests require a Neo4j instance running on port 7688. Use the docker-compose.yml provided or customize ports as needed. See the [Getting Started Guide](docs/getting-started.md) for detailed setup.
+Tests require Neo4j on port 7688. Use `docker-compose up -d` to start.
 
 ## License
 

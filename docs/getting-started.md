@@ -543,108 +543,25 @@ $results = DB::connection('graph')->cypher(
 
 ## Troubleshooting
 
-### Connection Refused
-
-**Problem:** Can't connect to Neo4j
-
-**Solutions:**
+**Quick checks:**
 ```bash
-# Check if Neo4j is running
-docker ps | grep neo4j
-
-# Start Neo4j if it's not running
-docker-compose up -d
-
-# Check Neo4j logs
-docker logs neo4j-test
-
-# Verify port in .env matches docker-compose.yml (7688)
+docker ps | grep neo4j      # Is Neo4j running?
+docker-compose up -d        # Start if not running
 ```
 
-### Authentication Failed
-
-**Problem:** Wrong credentials
-
-**Solutions:**
-- Check `.env` credentials match Docker config
-- Default: username `neo4j`, password `password`
-- Reset Neo4j password if needed via Browser UI
-
-### Class Not Found
-
-**Problem:** `GraphModel` class not found
-
-**Solutions:**
-```bash
-# Regenerate autoload files
-composer dump-autoload
-
-# Verify package is installed
-composer show looksystems/eloquent-cypher
-
-# Check service provider is registered in config/app.php
-```
-
-### Queries Not Working
-
-**Problem:** Eloquent queries fail
-
-**Solutions:**
-- Verify Neo4j is running (see "Connection Refused" above)
-- Check connection name matches in model: `protected $connection = 'graph';`
-- Test connection in tinker:
 ```php
-php artisan tinker
-DB::connection('graph')->getPdo();  // Should not throw error
+DB::connection('graph')->ping();  // Test connection in tinker
 ```
+
+For detailed solutions to connection, authentication, and query issues, see the [Troubleshooting Guide](troubleshooting.md).
 
 ---
 
 ## Next Steps
 
-You're now ready to build with Eloquent Cypher! Here's what to explore next:
-
-**Learn More:**
 - [Models and CRUD](models-and-crud.md) - Deep dive into model features
-- [Relationships](relationships.md) - Master all relationship types
-- [Querying](querying.md) - Advanced query builder techniques
-- [Neo4j Features Overview](neo4j-overview.md) - Graph-specific capabilities overview
-- [Cypher DSL](cypher-dsl.md) - Graph traversal and pattern matching
-
-**Performance:**
-- [Performance Guide](performance.md) - Optimize your queries and operations
-
-**Reference:**
-- [Quick Reference](quick-reference.md) - Cheat sheets and tables
-- [Troubleshooting](troubleshooting.md) - Common issues and solutions
-
----
-
-## Testing
-
-To run the package test suite:
-
-```bash
-# Run all tests (sequentially)
-./vendor/bin/pest
-
-# Run with coverage report
-./vendor/bin/pest --coverage-text
-
-# Run specific test
-./vendor/bin/pest tests/Feature/BasicCrudTest.php
-```
-
-**Note:** Tests use port 7688 by default.
-
----
-
-## Need Help?
-
-1. Check the test suite for usage examples
-2. Read the comprehensive documentation
-3. Open an issue on GitHub
-
----
-
-**Ready to explore?** Head to [Models and CRUD](models-and-crud.md) to learn about all the model features!
+- [Relationships](relationships.md) - All relationship types
+- [Querying](querying.md) - Advanced query techniques
+- [Cypher DSL](cypher-dsl.md) - Graph traversals and patterns
+- [Performance](performance.md) - Optimization tips
+- [Quick Reference](quick-reference.md) - Cheat sheets
