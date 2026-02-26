@@ -13,6 +13,8 @@
 
 Switch your Laravel application from MySQL/PostgreSQL to graph databases with zero code changes. Keep using the Eloquent API you know and love while gaining the power of graph databases.
 
+The project has approximately 1,520 tests with 24,000+ assertions across 152 test files.
+
 ## Table of Contents
 
 - [Installation](#installation)
